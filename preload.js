@@ -1,0 +1,22 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('buddyAPI', {
+  dragStart: (mousePos) => ipcRenderer.send('drag-start', mousePos),
+  dragMove: (mousePos) => ipcRenderer.send('drag-move', mousePos),
+  dragEnd: () => ipcRenderer.send('drag-end'),
+  closeApp: () => ipcRenderer.send('close-app'),
+  minimizeApp: () => ipcRenderer.send('minimize-app'),
+  chatWithClaude: (message, history) => ipcRenderer.invoke('chat-with-claude', message, history),
+  voiceControl: (cmd) => ipcRenderer.send('voice-control', cmd),
+  onVoiceEvent: (callback) => ipcRenderer.on('voice-event', (event, data) => callback(data)),
+  // Agent events
+  onAgentStep: (callback) => ipcRenderer.on('agent-step', (event, data) => callback(data)),
+  onAgentConfirm: (callback) => ipcRenderer.on('agent-confirm', (event, data) => callback(data)),
+  onAgentCancelled: (callback) => ipcRenderer.on('agent-cancelled', (event, data) => callback(data)),
+  agentConfirmResponse: (allowed) => ipcRenderer.send('agent-confirm-reply', allowed),
+  agentCancel: () => ipcRenderer.send('agent-cancel'),
+  // Scheduler events
+  onScheduledTask: (callback) => ipcRenderer.on('scheduled-task', (event, data) => callback(data)),
+  onTriggerAgentMessage: (callback) => ipcRenderer.on('trigger-agent-message', (event, data) => callback(data)),
+  schedulerTaskDone: () => ipcRenderer.send('scheduler-task-done'),
+});

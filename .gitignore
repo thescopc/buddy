@@ -1,0 +1,15 @@
+node_modules/
+mcp-tools/
+.env
+memory/
+skills/
+google_calendar/
+model/
+main.js
+
+# Testes
+test_*.py
+
+# OS
+Thumbs.db
+.DS_Store

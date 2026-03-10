@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buddy</title>
+  <style>
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+    
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-card: #1e2a45;
+      --accent: #e94560;
+      --accent-glow: rgba(233, 69, 96, 0.3);
+      --text: #eee;
+      --text-dim: #8892b0;
+      --face-skin: #ffcf9f;
+      --face-blush: #ff8fab;
+      --face-eye: #2d2d2d;
+      --bubble-user: #2d3a5c;
+      --bubble-bot: #e94560;
+    }
+
+    html, body {
+      width: 320px;
+      height: 420px;
+      overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+      background: transparent;
+      user-select: none;
+      color: var(--text);
+    }
+
+    /* ============================================================
+       CONTAINER PRINCIPAL
+       ============================================================ */
+    #app {
+      width: 320px;
+      height: 420px;
+      background: var(--bg-primary);
+      border-radius: 24px;
+      border: 2px solid rgba(233, 69, 96, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 30px rgba(233, 69, 96, 0.1);
+    }
+
+    /* ============================================================
+       BARRA DE TÍTULO (DRAG AREA)
+       ============================================================ */
+    #titlebar {
+      height: 36px;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      cursor: grab;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    #titlebar:active { cursor: grabbing; }
+    
+    #titlebar .title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    #titlebar .controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    #titlebar .controls button {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    #titlebar .controls button:hover { transform: scale(1.2); }
+    
+    .btn-minimize { background: #f5c542; }
+    .btn-close { background: #e94560; }
+
+    /* ============================================================
+       AREA DO ROSTO
+       ============================================================ */
+    #face-area {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      background: radial-gradient(ellipse at center, rgba(233,69,96,0.05) 0%, transparent 70%);
+    }
+
+    /* Container do rosto */
+    .face {
+      width: 120px;
+      height: 120px;
+      background: var(--face-skin);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 
+        0 8px 25px rgba(0,0,0,0.3),
+        inset 0 -5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      animation: float 3s ease-in-out infinite;
+      cursor: pointer;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Olhos */
+    .eye {
+      width: 18px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 38px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .eye-left { left: 30px; }
+    .eye-right { right: 30px; }
+
+    .pupil {
+      width: 10px;
+      height: 12px;
+      background: var(--face-eye);
+      border-radius: 50%;
+      position: absolute;
+      top: 5px;
+      left: 4px;
+      transition: all 0.1s ease;
+    }
+    .pupil::after {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 1px;
+      right: 1px;
+    }
+
+    /* Bochechas */
+    .blush {
+      width: 20px;
+      height: 12px;
+      background: var(--face-blush);
+      border-radius: 50%;
+      position: absolute;
+      top: 62px;
+      opacity: 0.5;
+    }
+    .blush-left { left: 14px; }
+    .blush-right { right: 14px; }
+
+    /* Boca */
+    .mouth {
+      width: 24px;
+      height: 12px;
+      border-bottom: 3px solid #c97050;
+      border-radius: 0 0 50% 50%;
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: all 0.3s ease;
+    }
+
+    /* ---- EXPRESSÕES ---- */
+    /* Feliz */
+    .face.happy .mouth {
+      height: 16px;
+      width: 28px;
+      border-bottom: 4px solid #c97050;
+      border-radius: 0 0 50% 50%;
+    }
+    .face.happy .blush { opacity: 0.8; }
+
+    /* Falando */
+    .face.talking .mouth {
+      width: 16px;
+      height: 16px;
+      border: 3px solid #c97050;
+      border-radius: 50%;
+      border-bottom: 3px solid #c97050;
+      animation: talk 0.3s ease-in-out infinite alternate;
+    }
+    @keyframes talk {
+      0% { transform: translateX(-50%) scaleY(0.6); }
+      100% { transform: translateX(-50%) scaleY(1.1); }
+    }
+
+    /* Pensando */
+    .face.thinking .eye {
+      animation: lookUp 1s ease-in-out infinite alternate;
+    }
+    @keyframes lookUp {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-3px); }
+    }
+    .face.thinking .mouth {
+      width: 10px;
+      height: 10px;
+      border: 3px solid #c97050;
+      border-radius: 50%;
+      border-bottom: 3px solid #c97050;
+    }
+
+    /* Dormindo */
+    .face.sleeping .eye {
+      height: 4px;
+      top: 46px;
+      border-radius: 0 0 50% 50%;
+      background: var(--face-eye);
+    }
+    .face.sleeping .pupil { display: none; }
+    .face.sleeping .mouth {
+      width: 14px;
+      height: 8px;
+      border: 2px solid #c97050;
+      border-radius: 50%;
+      animation: breathe 2s ease-in-out infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.2); }
+    }
+
+    /* Piscando */
+    .face.blinking .eye {
+      animation: blink 0.15s ease-in-out;
+    }
+    @keyframes blink {
+      0%, 100% { height: 22px; }
+      50% { height: 3px; }
+    }
+
+    /* Surpreso */
+    .face.surprised .eye {
+      width: 22px;
+      height: 26px;
+    }
+    .face.surprised .mouth {
+      width: 18px;
+      height: 18px;
+      border: 3px solid #c97050;
+      border-radius: 50%;
+    }
+
+    /* Indicador de status */
+    .status-indicator {
+      position: absolute;
+      bottom: 8px;
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+    }
+
+    /* Partículas decorativas ao redor */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 0.8; transform: scale(1); }
+    }
+
+    /* ============================================================
+       AREA DO CHAT
+       ============================================================ */
+    #chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(233,69,96,0.3) transparent;
+    }
+    #messages::-webkit-scrollbar { width: 4px; }
+    #messages::-webkit-scrollbar-thumb { background: rgba(233,69,96,0.3); border-radius: 2px; }
+
+    .msg {
+      max-width: 85%;
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-size: 12px;
+      line-height: 1.4;
+      animation: msgIn 0.25s ease-out;
+      word-wrap: break-word;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.user {
+      background: var(--bubble-user);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      color: var(--text);
+    }
+
+    .msg.bot {
+      background: var(--bubble-bot);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      color: white;
+    }
+
+    .msg.system {
+      align-self: center;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-style: italic;
+    }
+
+    /* ============================================================
+       INPUT AREA
+       ============================================================ */
+    #input-area {
+      padding: 8px 10px;
+      display: flex;
+      gap: 6px;
+      background: var(--bg-secondary);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+
+    #msg-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid rgba(233,69,96,0.2);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #msg-input:focus {
+      border-color: var(--accent);
+    }
+    #msg-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    #send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    #send-btn:hover {
+      background: #ff5a7a;
+      transform: scale(1.05);
+    }
+    #send-btn:active {
+      transform: scale(0.95);
+    }
+    #send-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+    }
+
+    /* Botão cancelar agente */
+    #cancel-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: #e94560;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      animation: micPulse 1s ease-in-out infinite;
+    }
+    #cancel-btn:hover {
+      background: #ff5a7a;
+      transform: scale(1.05);
+    }
+
+    /* Volume / TTS toggle */
+    #tts-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(233,69,96,0.3);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    #tts-btn.active {
+      background: rgba(233,69,96,0.2);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Botão de microfone */
+    #mic-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(233,69,96,0.3);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      position: relative;
+    }
+    #mic-btn.listening {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      animation: micPulse 1s ease-in-out infinite;
+    }
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(233, 69, 96, 0); }
+    }
+
+    /* Expressão: ouvindo */
+    .face.listening .eye {
+      width: 20px;
+      height: 20px;
+    }
+    .face.listening .blush { opacity: 0.9; }
+    .face.listening .mouth {
+      width: 8px;
+      height: 8px;
+      border: 2px solid #c97050;
+      border-radius: 50%;
+    }
+
+    /* Expressão: trabalhando (agente executando) */
+    .face.working .eye {
+      width: 16px;
+      height: 18px;
+    }
+    .face.working .pupil {
+      animation: workLook 1.5s ease-in-out infinite;
+    }
+    @keyframes workLook {
+      0%, 100% { transform: translateX(-2px); }
+      50% { transform: translateX(2px); }
+    }
+    .face.working .mouth {
+      width: 18px;
+      height: 4px;
+      border-bottom: 3px solid #c97050;
+      border-radius: 0;
+    }
+    .face.working .blush { opacity: 0.3; }
+
+    /* Mensagem de step do agente */
+    .msg.step {
+      align-self: center;
+      background: rgba(78, 205, 196, 0.15);
+      color: #4ecdc4;
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(78, 205, 196, 0.2);
+      max-width: 95%;
+      font-family: 'Courier New', monospace;
+    }
+    .msg.step.denied {
+      background: rgba(233, 69, 96, 0.15);
+      color: var(--accent);
+      border-color: rgba(233, 69, 96, 0.3);
+    }
+
+    /* Modal de confirmação */
+    #confirm-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    #confirm-overlay.visible {
+      display: flex;
+    }
+    #confirm-box {
+      background: var(--bg-card);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 16px;
+      width: 280px;
+      text-align: center;
+    }
+    #confirm-box h3 {
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    #confirm-detail {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      word-break: break-all;
+      max-height: 80px;
+      overflow-y: auto;
+      text-align: left;
+      background: rgba(0,0,0,0.2);
+      padding: 8px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+    }
+    #confirm-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    #confirm-buttons button {
+      padding: 8px 20px;
+      border-radius: 10px;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.2s;
+    }
+    #btn-allow {
+      background: #4ecdc4;
+      color: #1a1a2e;
+    }
+    #btn-allow:hover { background: #5ff0e6; }
+    #btn-deny {
+      background: var(--accent);
+      color: white;
+    }
+    #btn-deny:hover { background: #ff5a7a; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Titlebar / Drag area -->
+  <div id="titlebar">
+    <span class="title">✦ Buddy</span>
+    <div class="controls">
+      <button class="btn-minimize" onclick="window.buddyAPI.minimizeApp()" title="Esconder (Ctrl+Shift+B)"></button>
+      <button class="btn-close" onclick="window.buddyAPI.closeApp()" title="Fechar"></button>
+    </div>
+  </div>
+
+  <!-- Face area -->
+  <div id="face-area">
+    <!-- Partículas decorativas -->
+    <div class="particle" style="width:6px;height:6px;background:var(--accent);top:20px;left:40px;animation-delay:0s;"></div>
+    <div class="particle" style="width:4px;height:4px;background:#f5c542;top:30px;right:50px;animation-delay:0.7s;"></div>
+    <div class="particle" style="width:5px;height:5px;background:#4ecdc4;bottom:20px;left:60px;animation-delay:1.4s;"></div>
+    <div class="particle" style="width:3px;height:3px;background:var(--face-blush);top:15px;right:80px;animation-delay:0.3s;"></div>
+
+    <div class="face happy" id="buddy-face">
+      <div class="eye eye-left">
+        <div class="pupil" id="pupil-left"></div>
+      </div>
+      <div class="eye eye-right">
+        <div class="pupil" id="pupil-right"></div>
+      </div>
+      <div class="blush blush-left"></div>
+      <div class="blush blush-right"></div>
+      <div class="mouth"></div>
+    </div>
+
+    <span class="status-indicator" id="status">acordado ✨</span>
+  </div>
+
+  <!-- Chat -->
+  <div id="chat-area">
+    <div id="messages">
+    </div>
+    <div id="input-area">
+      <button id="tts-btn" class="active" onclick="toggleTTS()" title="Voz ligada/desligada">🔊</button>
+      <button id="mic-btn" onclick="toggleMic()" title="Falar com Buddy (clique para ouvir)">🎤</button>
+      <input type="text" id="msg-input" placeholder="Buddy, quanto é..." autocomplete="off">
+      <button id="send-btn" onclick="sendMessage()" title="Enviar">▶</button>
+      <button id="cancel-btn" onclick="cancelAgent()" title="Cancelar tarefa" style="display:none;">✕</button>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação (ações perigosas) -->
+  <div id="confirm-overlay">
+    <div id="confirm-box">
+      <h3>⚠️ Buddy quer executar:</h3>
+      <div id="confirm-detail"></div>
+      <div id="confirm-buttons">
+        <button id="btn-allow" onclick="confirmAction(true)">✓ Permitir</button>
+        <button id="btn-deny" onclick="confirmAction(false)">✕ Negar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // STATE
+  // ============================================================
+  let conversationHistory = [];
+  let ttsEnabled = true;
+  let isProcessing = false;
+  let currentExpression = 'happy';
+  let blinkInterval;
+  let idleTimeout;
+
+  const face = document.getElementById('buddy-face');
+  const status = document.getElementById('status');
+  const messagesEl = document.getElementById('messages');
+  const input = document.getElementById('msg-input');
+  const sendBtn = document.getElementById('send-btn');
+  const ttsBtn = document.getElementById('tts-btn');
+
+  // ============================================================
+  // DRAG (Titlebar)
+  // ============================================================
+  const titlebar = document.getElementById('titlebar');
+  titlebar.addEventListener('mousedown', (e) => {
+    window.buddyAPI.dragStart({ x: e.screenX, y: e.screenY });
+    const onMove = (ev) => window.buddyAPI.dragMove({ x: ev.screenX, y: ev.screenY });
+    const onUp = () => {
+      window.buddyAPI.dragEnd();
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  // ============================================================
+  // EXPRESSÕES
+  // ============================================================
+  function setExpression(expr) {
+    face.className = 'face ' + expr;
+    currentExpression = expr;
+    
+    const statusMap = {
+      'happy': 'acordado ✨',
+      'talking': 'falando... 🗣️',
+      'thinking': 'pensando... 🤔',
+      'sleeping': 'dormindo 💤',
+      'surprised': 'surpreso! 😮',
+      'listening': 'ouvindo... 🎤',
+      'working': 'executando... ⚡',
+      'blinking': currentExpression
+    };
+    
+    if (statusMap[expr]) {
+      status.textContent = statusMap[expr];
+    }
+  }
+
+  // Piscar aleatório
+  function startBlinking() {
+    blinkInterval = setInterval(() => {
+      if (currentExpression === 'happy' || currentExpression === 'sleeping') {
+        if (currentExpression !== 'sleeping') {
+          setExpression('blinking');
+          setTimeout(() => setExpression('happy'), 200);
+        }
+      }
+    }, 3000 + Math.random() * 4000);
+  }
+  startBlinking();
+
+  // Idle -> dormindo após 60s sem interação
+  function resetIdleTimer() {
+    clearTimeout(idleTimeout);
+    if (currentExpression === 'sleeping') {
+      setExpression('happy');
+    }
+    idleTimeout = setTimeout(() => {
+      if (!isProcessing) {
+        setExpression('sleeping');
+      }
+    }, 60000);
+  }
+  resetIdleTimer();
+
+  // ============================================================
+  // OLHOS SEGUEM O MOUSE
+  // ============================================================
+  document.addEventListener('mousemove', (e) => {
+    if (currentExpression === 'sleeping') return;
+    
+    const faceRect = face.getBoundingClientRect();
+    const faceCX = faceRect.left + faceRect.width / 2;
+    const faceCY = faceRect.top + faceRect.height / 2;
+    
+    const dx = e.clientX - faceCX;
+    const dy = e.clientY - faceCY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const maxMove = 3;
+    
+    const moveX = (dx / Math.max(dist, 1)) * Math.min(dist * 0.02, maxMove);
+    const moveY = (dy / Math.max(dist, 1)) * Math.min(dist * 0.02, maxMove);
+
+    document.getElementById('pupil-left').style.transform = `translate(${moveX}px, ${moveY}px)`;
+    document.getElementById('pupil-right').style.transform = `translate(${moveX}px, ${moveY}px)`;
+  });
+
+  // ============================================================
+  // TTS (Text-to-Speech)
+  // ============================================================
+  function toggleTTS() {
+    ttsEnabled = !ttsEnabled;
+    ttsBtn.classList.toggle('active', ttsEnabled);
+    ttsBtn.textContent = ttsEnabled ? '🔊' : '🔇';
+  }
+
+  // Remove emojis e caracteres especiais do texto antes do TTS
+  function cleanTextForTTS(text) {
+    return text
+      .replace(/[\u{1F600}-\u{1F64F}]/gu, '')   // Emoticons
+      .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')   // Símbolos diversos
+      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')   // Transporte
+      .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')   // Bandeiras
+      .replace(/[\u{2600}-\u{26FF}]/gu, '')      // Símbolos misc
+      .replace(/[\u{2700}-\u{27BF}]/gu, '')      // Dingbats
+      .replace(/[\u{FE00}-\u{FE0F}]/gu, '')      // Variation selectors
+      .replace(/[\u{1F900}-\u{1F9FF}]/gu, '')   // Suplemento
+      .replace(/[\u{200D}]/gu, '')                // Zero width joiner
+      .replace(/[\u{20E3}]/gu, '')                // Combining
+      .replace(/[\u{E0020}-\u{E007F}]/gu, '')   // Tags
+      .replace(/[✦✨⚡🔐📅✅❌⏰🔄✓✕★☆♦♠♣♥●○■□▶◀▲▼►◄]/g, '') // Símbolos comuns
+      .replace(/\s{2,}/g, ' ')                    // Espaços duplos
+      .trim();
+  }
+
+  function speak(text) {
+    if (!ttsEnabled) return;
+    // Avisa o Python para pausar (não captar própria voz)
+    window.buddyAPI.voiceControl('SLEEP');
+    window.speechSynthesis.cancel();
+    const cleanText = cleanTextForTTS(text);
+    if (!cleanText) return; // Nada pra falar após limpar
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 1.05;
+    utterance.pitch = 1.15;
+    const voices = window.speechSynthesis.getVoices();
+    const ptVoice = voices.find(v => v.lang.startsWith('pt-BR')) 
+                 || voices.find(v => v.lang.startsWith('pt'));
+    if (ptVoice) utterance.voice = ptVoice;
+    utterance.onstart = () => setExpression('talking');
+    utterance.onend = () => {
+      setExpression('happy');
+      // Retoma escuta do Python
+      setTimeout(() => window.buddyAPI.voiceControl('WAKE'), 800);
+    };
+    window.speechSynthesis.speak(utterance);
+  }
+
+  // Para de falar imediatamente
+  function stopSpeaking() {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setExpression('happy');
+      setTimeout(() => window.buddyAPI.voiceControl('WAKE'), 300);
+    }
+  }
+
+  // Clique no rosto = para de falar
+  face.addEventListener('click', () => {
+    stopSpeaking();
+    resetIdleTimer();
+  });
+
+  // Carrega vozes (pode demorar)
+  window.speechSynthesis.onvoiceschanged = () => {
+    window.speechSynthesis.getVoices();
+  };
+
+  // ============================================================
+  // CHAT
+  // ============================================================
+  function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + type;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || isProcessing) return;
+
+    resetIdleTimer();
+    isProcessing = true;
+    sendBtn.disabled = true;
+    input.value = '';
+
+    // Msg do usuário
+    addMessage(text, 'user');
+
+    // Expressão pensando + modo agente visual
+    setExpression('thinking');
+    setAgentRunning(true);
+
+    try {
+      // Chama Claude via IPC
+      const reply = await window.buddyAPI.chatWithClaude(text, conversationHistory);
+
+      // Atualiza histórico (mantém últimas 20 msgs)
+      conversationHistory.push({ role: 'user', content: text });
+      conversationHistory.push({ role: 'assistant', content: reply });
+      if (conversationHistory.length > 20) {
+        conversationHistory = conversationHistory.slice(-20);
+      }
+
+      // Mostra resposta
+      setExpression('happy');
+      addMessage(reply, 'bot');
+
+      // Fala
+      speak(reply);
+
+    } catch (err) {
+      setExpression('surprised');
+      addMessage('Ops, algo deu errado... 😅', 'bot');
+      setTimeout(() => setExpression('happy'), 2000);
+    }
+
+    isProcessing = false;
+    sendBtn.disabled = false;
+    setAgentRunning(false);
+    input.focus();
+    goPassive();
+  }
+
+  // Enter pra enviar
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+    resetIdleTimer();
+  });
+
+  // ============================================================
+  // VOZ - VOSK via Python (100% local e gratuito)
+  // ============================================================
+  const micBtn = document.getElementById('mic-btn');
+
+  // Recebe eventos do Python via IPC
+  window.buddyAPI.onVoiceEvent((msg) => {
+    resetIdleTimer();
+
+    switch(msg.type) {
+      case 'status':
+        addMessage(msg.text, 'system');
+        break;
+
+      case 'ready':
+        status.textContent = 'modelo carregado ✓';
+        break;
+
+      case 'listening':
+        micBtn.classList.add('listening');
+        status.textContent = 'escutando... 👂';
+        break;
+
+      case 'wake':
+        // Buddy detectado - mostra que ta ouvindo
+        setExpression('listening');
+        status.textContent = 'ouvindo... 🎤';
+        micBtn.style.background = 'var(--accent)';
+        micBtn.style.color = 'white';
+        input.placeholder = 'Pode falar...';
+        break;
+
+      case 'activated':
+        // Modo conversa ativado
+        setExpression('happy');
+        status.textContent = 'modo conversa ativo 💬';
+        micBtn.style.background = '#4ecdc4';
+        micBtn.style.color = 'white';
+        input.placeholder = 'Modo conversa - fale à vontade!';
+        addMessage('Modo conversa ativado! Pode falar à vontade. Diga "tchau Buddy" pra desativar.', 'bot');
+        speak('Modo conversa ativado! Pode falar à vontade.');
+        break;
+
+      case 'deactivated':
+        // Modo conversa desativado
+        goPassive();
+        addMessage('Até mais! Diga "Buddy" quando precisar de mim.', 'bot');
+        speak('Até mais! Me chama quando precisar.');
+        break;
+
+      case 'command':
+        // Comando de voz completo
+        input.value = msg.text;
+        sendMessage();
+        break;
+
+      case 'partial':
+        // Texto parcial enquanto fala
+        input.value = msg.text;
+        status.textContent = 'ouvindo... 🎤';
+        setExpression('listening');
+        break;
+
+      case 'error':
+        addMessage(msg.text, 'system');
+        setExpression('surprised');
+        setTimeout(() => setExpression('happy'), 3000);
+        break;
+    }
+  });
+
+  function goPassive() {
+    input.value = '';
+    input.placeholder = 'Diga "Buddy" + comando';
+    micBtn.style.background = '';
+    micBtn.style.color = '';
+    if (!isProcessing) {
+      setExpression('happy');
+      status.textContent = 'escutando... 👂';
+    }
+  }
+
+  function toggleMic() {
+    // Envia comando RECORD pro Python — força início de gravação
+    window.buddyAPI.voiceControl('RECORD');
+    setExpression('listening');
+    status.textContent = 'ouvindo... 🎤';
+    resetIdleTimer();
+  }
+
+  // ============================================================
+  // AGENTE - Feedback visual + Confirmação + Cancelar
+  // ============================================================
+  const cancelBtn = document.getElementById('cancel-btn');
+  const confirmOverlay = document.getElementById('confirm-overlay');
+  const confirmDetail = document.getElementById('confirm-detail');
+
+  // Mostra/esconde botão cancelar durante execução
+  function setAgentRunning(running) {
+    sendBtn.style.display = running ? 'none' : 'flex';
+    cancelBtn.style.display = running ? 'flex' : 'none';
+  }
+
+  // Feedback: cada step do agente aparece no chat
+  window.buddyAPI.onAgentStep((data) => {
+    const toolLabel = formatToolLabel(data.tool, data.args);
+    
+    if (data.status === 'executing') {
+      setExpression('working');
+      addMessage(`⚡ ${toolLabel}`, 'step');
+    } else if (data.status === 'done') {
+      // nada visual extra, o próximo step ou resposta final aparece
+    } else if (data.status === 'denied') {
+      addMessage(`🚫 Negado: ${data.tool}`, 'step denied');
+    } else if (data.status === 'confirming') {
+      setExpression('surprised');
+    }
+  });
+
+  // Confirmação de ação perigosa
+  window.buddyAPI.onAgentConfirm((data) => {
+    const label = formatToolLabel(data.tool, data.args);
+    confirmDetail.textContent = `${data.tool}\n${JSON.stringify(data.args, null, 2)}`.substring(0, 300);
+    confirmOverlay.classList.add('visible');
+  });
+
+  function confirmAction(allowed) {
+    confirmOverlay.classList.remove('visible');
+    setExpression('working');
+    window.buddyAPI.agentConfirmResponse(allowed);
+  }
+
+  // Cancelar agente
+  function cancelAgent() {
+    window.buddyAPI.agentCancel();
+    setAgentRunning(false);
+    addMessage('Cancelando...', 'system');
+  }
+
+  // Quando agente é cancelado
+  window.buddyAPI.onAgentCancelled((data) => {
+    setAgentRunning(false);
+    setExpression('happy');
+  });
+
+  // Formata label legível pra cada tool
+  function formatToolLabel(tool, args) {
+    const labels = {
+      'execute_command': `Executando: ${args.command || ''}`.substring(0, 60),
+      'read_file': `Lendo: ${args.path || ''}`.substring(0, 60),
+      'write_file': `Escrevendo: ${args.path || ''}`.substring(0, 60),
+      'list_directory': `Listando: ${args.path || ''}`.substring(0, 60),
+      'search_files': `Buscando: ${args.pattern || args.path || ''}`.substring(0, 60),
+      'search_code': `Buscando código: ${args.pattern || ''}`.substring(0, 60),
+      'move_file': `Movendo: ${args.source || ''} → ${args.destination || ''}`.substring(0, 60),
+      'edit_block': `Editando: ${args.file_path || ''}`.substring(0, 60),
+      'create_directory': `Criando pasta: ${args.path || ''}`.substring(0, 60),
+    };
+    return labels[tool] || `${tool}`;
+  }
+
+  input.focus();
+
+  // ============================================================
+  // SCHEDULER: Recebe tarefa agendada do main.js
+  // ============================================================
+  window.buddyAPI.onScheduledTask((data) => {
+    addMessage(`⏰ Tarefa agendada (${data.time}): ${data.task}`, 'system');
+    resetIdleTimer();
+  });
+
+  window.buddyAPI.onTriggerAgentMessage(async (data) => {
+    if (isProcessing) return; // Não interrompe se já está fazendo algo
+
+    resetIdleTimer();
+    isProcessing = true;
+    sendBtn.disabled = true;
+    setExpression('working');
+    setAgentRunning(true);
+
+    try {
+      const reply = await window.buddyAPI.chatWithClaude(data.message, conversationHistory);
+      conversationHistory.push({ role: 'user', content: data.message });
+      conversationHistory.push({ role: 'assistant', content: reply });
+      if (conversationHistory.length > 20) {
+        conversationHistory = conversationHistory.slice(-20);
+      }
+      setExpression('happy');
+      addMessage(reply, 'bot');
+      speak(reply);
+    } catch (e) {
+      setExpression('surprised');
+      addMessage('Erro na tarefa agendada 😅', 'bot');
+      setTimeout(() => setExpression('happy'), 2000);
+    }
+
+    isProcessing = false;
+    sendBtn.disabled = false;
+    setAgentRunning(false);
+    // Avisa o main.js que a tarefa agendada terminou
+    window.buddyAPI.schedulerTaskDone();
+  });
+
+  // ============================================================
+  // AUTO-INIT: Buddy se apresenta ao abrir
+  // ============================================================
+  (async function buddyInit() {
+    // Pequeno delay pra dar tempo de carregar tudo
+    await new Promise(r => setTimeout(r, 2000));
+    
+    setExpression('thinking');
+    isProcessing = true;
+    sendBtn.disabled = true;
+
+    try {
+      const reply = await window.buddyAPI.chatWithClaude('[BUDDY_INIT]', conversationHistory);
+      conversationHistory.push({ role: 'user', content: '[BUDDY_INIT]' });
+      conversationHistory.push({ role: 'assistant', content: reply });
+      if (conversationHistory.length > 20) {
+        conversationHistory = conversationHistory.slice(-20);
+      }
+      setExpression('happy');
+      addMessage(reply, 'bot');
+      speak(reply);
+    } catch (e) {
+      setExpression('happy');
+    }
+
+    isProcessing = false;
+    sendBtn.disabled = false;
+    setAgentRunning(false);
+  })();
+</script>
+</body>
+</html>

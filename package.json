@@ -1,0 +1,16 @@
+{
+  "name": "buddy-desktop",
+  "version": "1.0.0",
+  "description": "Assistente de desktop com rostinho animado e IA",
+  "main": "main.js",
+  "scripts": {
+    "setup-mcp": "node setup-mcp.js",
+    "start": "node setup-mcp.js && npx electron .",
+    "build": "npx electron-builder"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}
