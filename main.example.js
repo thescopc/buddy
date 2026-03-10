@@ -455,6 +455,27 @@ ipcMain.on('minimize-app', () => { mainWindow.hide(); });
 const MAX_AGENT_ITERATIONS = 25;
 const DANGEROUS_TOOLS = ['write_file', 'execute_command', 'move_file', 'edit_block'];
 
+// Caminhos seguros que não precisam de confirmação (memória e tasks)
+function isSafePath(toolName, toolArgs) {
+  const memoryNorm = MEMORY_DIR.replace(/\\/g, '/').toLowerCase();
+  const tasksNorm = path.join(MEMORY_DIR, 'tasks.md').replace(/\\/g, '/').toLowerCase();
+  
+  // Pega o caminho do argumento (varia por tool)
+  let targetPath = '';
+  if (toolName === 'write_file') targetPath = (toolArgs.path || '').replace(/\\/g, '/').toLowerCase();
+  else if (toolName === 'edit_block') targetPath = (toolArgs.file_path || '').replace(/\\/g, '/').toLowerCase();
+  else if (toolName === 'move_file') targetPath = (toolArgs.source || '').replace(/\\/g, '/').toLowerCase();
+  
+  if (!targetPath) return false;
+  
+  // Se é dentro da pasta memory/ → seguro
+  if (targetPath.startsWith(memoryNorm)) return true;
+  // Se contém /memory/ no caminho (caso o agente use caminho relativo)
+  if (targetPath.includes('/memory/')) return true;
+  
+  return false;
+}
+
 // Flag para cancelar execução do agente
 let agentCancelled = false;
 
@@ -637,8 +658,8 @@ COMO USAR SKILLS:
 
           console.log(`[AGENT] Tool call: ${toolName}`, JSON.stringify(toolArgs).substring(0, 200));
 
-          // ---- PROTEÇÃO: Tool perigosa → pede confirmação ----
-          if (DANGEROUS_TOOLS.includes(toolName)) {
+          // ---- PROTEÇÃO: Tool perigosa → pede confirmação (exceto memória/tasks) ----
+          if (DANGEROUS_TOOLS.includes(toolName) && !isSafePath(toolName, toolArgs)) {
             sendAgentEvent('agent-step', { tool: toolName, args: toolArgs, iteration, status: 'confirming' });
             
             const allowed = await askUserConfirmation(toolName, toolArgs);
