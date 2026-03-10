@@ -279,6 +279,88 @@
       letter-spacing: 0.5px;
     }
 
+    /* Sobrancelhas (invisíveis por padrão, aparecem no angry) */
+    .eyebrow {
+      width: 20px;
+      height: 3px;
+      background: #8B4513;
+      position: absolute;
+      top: 30px;
+      border-radius: 2px;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .eyebrow-left { left: 29px; transform: rotate(0deg); }
+    .eyebrow-right { right: 29px; transform: rotate(0deg); }
+
+    /* Dentes (invisíveis por padrão) */
+    .teeth {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    /* Expressão: bravo/mutado */
+    .face.angry {
+      animation: none;
+      transform: scale(0.95);
+    }
+    .face.angry .eyebrow {
+      opacity: 1;
+    }
+    .face.angry .eyebrow-left {
+      transform: rotate(25deg);
+      top: 28px;
+      left: 26px;
+    }
+    .face.angry .eyebrow-right {
+      transform: rotate(-25deg);
+      top: 28px;
+      right: 26px;
+    }
+    .face.angry .eye {
+      width: 16px;
+      height: 14px;
+      top: 42px;
+    }
+    .face.angry .pupil {
+      width: 9px;
+      height: 10px;
+      top: 2px;
+    }
+    .face.angry .blush {
+      opacity: 0;
+    }
+    .face.angry .mouth {
+      width: 30px;
+      height: 8px;
+      border: 2px solid #c97050;
+      border-radius: 2px;
+      background: #3a1a0a;
+      bottom: 28px;
+    }
+    .face.angry .teeth {
+      opacity: 1;
+      width: 26px;
+      height: 5px;
+      bottom: 31px;
+      background: repeating-linear-gradient(
+        90deg,
+        white 0px, white 4px,
+        #3a1a0a 4px, #3a1a0a 5px
+      );
+      border-radius: 1px;
+      z-index: 1;
+    }
+    .face.angry .face-vein {
+      opacity: 1;
+    }
+
     /* Partículas decorativas ao redor */
     .particle {
       position: absolute;
@@ -620,6 +702,8 @@
     <div class="particle" style="width:3px;height:3px;background:var(--face-blush);top:15px;right:80px;animation-delay:0.3s;"></div>
 
     <div class="face happy" id="buddy-face">
+      <div class="eyebrow eyebrow-left"></div>
+      <div class="eyebrow eyebrow-right"></div>
       <div class="eye eye-left">
         <div class="pupil" id="pupil-left"></div>
       </div>
@@ -629,6 +713,7 @@
       <div class="blush blush-left"></div>
       <div class="blush blush-right"></div>
       <div class="mouth"></div>
+      <div class="teeth"></div>
     </div>
 
     <span class="status-indicator" id="status">acordado ✨</span>
@@ -709,6 +794,7 @@
       'surprised': 'surpreso! 😮',
       'listening': 'ouvindo... 🎤',
       'working': 'executando... ⚡',
+      'angry': 'calado! 😤',
       'blinking': currentExpression
     };
     
@@ -827,9 +913,18 @@
     }
   }
 
-  // Clique no rosto = para de falar
+  // Clique no rosto = para de falar + cara de bravo
   face.addEventListener('click', () => {
-    stopSpeaking();
+    if (window.speechSynthesis.speaking) {
+      stopSpeaking();
+      setExpression('angry');
+      // Volta ao normal depois de 2 segundos
+      setTimeout(() => {
+        if (currentExpression === 'angry') {
+          setExpression('happy');
+        }
+      }, 2000);
+    }
     resetIdleTimer();
   });
 
