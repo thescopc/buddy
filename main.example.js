@@ -199,23 +199,29 @@ function checkScheduledTasks() {
     if (!fs.existsSync(tasksPath)) return;
 
     const content = fs.readFileSync(tasksPath, 'utf-8');
-    const lines = content.split('\n');
+    // Separa tarefas grudadas (o Buddy às vezes escreve sem \n)
+    const normalized = content.replace(/(- \[[ x]\])/g, '\n$1').trim();
+    const lines = normalized.split('\n');
     const now = new Date();
     const currentHH = String(now.getHours()).padStart(2, '0');
     const currentMM = String(now.getMinutes()).padStart(2, '0');
     const currentTime = `${currentHH}:${currentMM}`;
 
+    console.log(`[SCHEDULER] Hora atual: ${currentTime}, checando ${lines.length} linhas`);
+
     for (const line of lines) {
       // Formato: - [ ] HH:MM - Descrição da tarefa
-      const match = line.match(/^- \[ \] (\d{2}:\d{2}) - (.+)$/);
+      const match = line.trim().match(/^- \[ \] (\d{2}:\d{2})\s*[-–]\s*(.+)$/);
       if (!match) continue;
 
       const taskTime = match[1];
       const taskDesc = match[2].trim();
 
+      console.log(`[SCHEDULER] Tarefa encontrada: ${taskTime} - ${taskDesc} (hora atual: ${currentTime})`);
+
       // Dispara se o horário já passou (ou é agora) e não foi executada
       if (taskTime <= currentTime) {
-        console.log(`[SCHEDULER] Disparando tarefa: ${taskTime} - ${taskDesc}`);
+        console.log(`[SCHEDULER] DISPARANDO: ${taskTime} - ${taskDesc}`);
         executeScheduledTask(taskDesc, taskTime);
         return; // Uma tarefa por vez
       }
@@ -233,7 +239,17 @@ async function executeScheduledTask(taskDesc, taskTime) {
   mainWindow.webContents.send('scheduled-task', { task: taskDesc, time: taskTime });
 
   try {
-    const message = `[TAREFA AGENDADA - ${taskTime}] Execute esta tarefa: ${taskDesc}. Após concluir, marque como feita no tasks.md trocando "- [ ] ${taskTime} - ${taskDesc}" por "- [x] ${taskTime} - ${taskDesc} (concluída)".`;
+    const message = `[TAREFA AGENDADA - ${taskTime}]
+
+TAREFA: ${taskDesc}
+
+INSTRUÇÕES (siga nesta ORDEM EXATA):
+1. PRIMEIRO: Interprete a tarefa. Se for um lembrete (ex: "tomar água", "fazer backup", "reunião"), FALE para o usuário imediatamente. Exemplo: "Ei! São ${taskTime}, hora de tomar água! 💧"
+2. Se a tarefa envolve uma AÇÃO no computador (criar arquivo, abrir programa, etc), execute a ação usando as ferramentas.
+3. SOMENTE DEPOIS de ter respondido/executado a tarefa, marque como concluída no tasks.md usando edit_block, trocando "- [ ] ${taskTime} - ${taskDesc}" por "- [x] ${taskTime} - ${taskDesc} (concluída)".
+4. Anote no daily de hoje que executou esta tarefa.
+
+IMPORTANTE: NÃO marque como concluída antes de executar/responder. A prioridade é FALAR com o usuário primeiro.`;
     
     // Envia pro renderer executar via agente
     mainWindow.webContents.send('trigger-agent-message', { message });
@@ -473,6 +489,8 @@ ipcMain.handle('chat-with-claude', async (event, userMessage, history) => {
   const memory = loadMemory();
   const memoryDir = MEMORY_DIR.replace(/\\/g, '/');
   const todayStr = getTodayDateStr();
+  const now = new Date();
+  const currentTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const isFirstUse = memory.user.includes('Buddy ainda não sabe o nome do usuário');
 
   // Carrega lista de skills
@@ -484,6 +502,8 @@ ipcMain.handle('chat-with-claude', async (event, userMessage, history) => {
   const sys = {
     role: 'system',
     content: `${memory.personality}
+
+HORA ATUAL: ${currentTime} | DATA: ${todayStr}
 
 ${memory.user}
 
@@ -530,12 +550,13 @@ Caminhos dos arquivos de memória:
 - ${memoryDir}/tasks.md → Tarefas pendentes
 
 REGRAS DE MEMÓRIA:
-- Após COMPLETAR uma tarefa, escreva um resumo curto (1 linha) no daily de hoje usando write_file com mode append
+- Após COMPLETAR uma tarefa, escreva um resumo curto (1 linha) no daily de hoje usando write_file com mode append. SEMPRE comece com \\n antes do texto.
 - Se o usuário disser o nome dele, atualize user.md imediatamente
 - Se o usuário pedir pra lembrar algo, anote em user.md ou no daily
-- Se o usuário criar uma tarefa agendada ("me lembre às 14h de..."), adicione em tasks.md no formato: - [ ] HH:MM - Descrição
+- Se o usuário criar uma tarefa agendada ("me lembre às 14h de...", "me avise quando...", etc), LEIA o tasks.md primeiro, depois adicione a nova tarefa usando write_file com mode append. O conteúdo DEVE começar com \\n (quebra de linha) seguido do formato: - [ ] HH:MM - Descrição. Exemplo de conteúdo para write_file append: "\\n- [ ] 14:30 - Tomar água"
 - Quando completar uma tarefa de tasks.md, marque como [x] usando edit_block
 - Se o usuário perguntar "o que você fez ontem/semana passada", leia os arquivos em ${memoryDir}/daily/
+- HORA ATUAL DO SISTEMA: ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} (use como referência para tarefas)
 
 FERRAMENTAS DISPONÍVEIS (via Desktop Commander MCP):
 ${toolNames}
