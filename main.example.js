@@ -361,11 +361,29 @@ function startVoiceListener() {
 
   voiceProcess.stderr.on('data', (data) => {
     const t = data.toString().trim();
-    if (t) console.log('[VOSK-ERR]', t);
+    if (t) {
+      console.log('[VOSK-ERR]', t);
+      // Envia erros importantes pro renderer
+      if (t.includes('No module') || t.includes('ModuleNotFoundError') || t.includes('Error') || t.includes('error')) {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('voice-event', { type: 'error', text: `Voz: ${t.substring(0, 100)}` });
+        }
+      }
+    }
   });
   voiceProcess.on('close', (code) => {
-    if (code !== 0 && mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('voice-event', { type: 'error', text: `Voice parou (${code})` });
+    console.log(`[VOICE] Processo encerrou com código ${code}`);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      if (code !== 0) {
+        mainWindow.webContents.send('voice-event', { type: 'error', text: `Microfone indisponível. Use o chat por texto.` });
+      }
+    }
+  });
+
+  voiceProcess.on('error', (err) => {
+    console.error('[VOICE] Erro ao iniciar processo:', err.message);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('voice-event', { type: 'error', text: `Erro de voz: ${err.message}` });
     }
   });
 }

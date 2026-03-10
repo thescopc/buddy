@@ -113,6 +113,19 @@ def main():
 
     last_sound_time = time.time()
 
+    # Verifica se tem microfone disponível
+    try:
+        devices = sd.query_devices()
+        input_devices = [d for d in devices if d['max_input_channels'] > 0]
+        if not input_devices:
+            send("error", "Nenhum microfone encontrado! Conecte um microfone e reinicie.")
+            sys.exit(1)
+        default_input = sd.query_devices(kind='input')
+        send("status", f"Microfone: {default_input['name']}")
+    except Exception as e:
+        send("error", f"Erro ao detectar microfone: {e}")
+        sys.exit(1)
+
     try:
         with sd.RawInputStream(
             samplerate=SAMPLE_RATE, blocksize=2000,
