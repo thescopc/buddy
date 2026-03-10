@@ -81,11 +81,7 @@ Diferente de um chatbot simples, o Buddy é um **agente autônomo**: você dá u
    ```
    Edite `main.js` e substitua `SUA_OPENAI_API_KEY_AQUI` pela sua chave.
 
-3. Baixe o modelo Vosk pt-BR:
-   - Link: https://alphacephei.com/vosk/models/vosk-model-small-pt-0.3.zip
-   - Extraia e renomeie a pasta para `model/` dentro do projeto
-
-4. Instale e rode:
+3. Instale e rode:
    ```bash
    npm install
    npm start
