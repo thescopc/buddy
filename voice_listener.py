@@ -94,9 +94,9 @@ def main():
     state = "passive"
     recording_buffer = bytearray()
     recording_start = 0
-    RECORD_MAX = 5  # Max segundos gravando comando
-    SILENCE_TIMEOUT = 1.5
-    CONVERSATION_SILENCE = 2.0  # Segundos de silencio para parar gravacao
+    RECORD_MAX = 30  # Max segundos gravando comando (antes era 5)
+    SILENCE_TIMEOUT = 2.0  # Segundos de silencio para parar gravacao no modo comando (antes era 1.5)
+    CONVERSATION_SILENCE = 2.5  # Segundos de silencio para parar no modo conversa
 
     def audio_cb(indata, frames, time_info, status):
         if not is_paused:
