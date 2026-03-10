@@ -312,9 +312,31 @@ ipcMain.handle('mcp-list-tools', async () => {
 // ============================================================
 // VOICE LISTENER (Python + Vosk)
 // ============================================================
+const { execSync } = require('child_process');
+
+// Detecta qual comando de Python está disponível no sistema
+function findPythonCommand() {
+  const candidates = ['py', 'python', 'python3'];
+  for (const cmd of candidates) {
+    try {
+      execSync(`${cmd} --version`, { stdio: 'ignore' });
+      console.log(`[PYTHON] Encontrado: ${cmd}`);
+      return cmd;
+    } catch (e) { /* não encontrado, tenta próximo */ }
+  }
+  console.error('[PYTHON] Nenhum Python encontrado! Instale Python 3.10+');
+  return null;
+}
+
 function startVoiceListener() {
+  const pythonCmd = findPythonCommand();
+  if (!pythonCmd) {
+    console.error('[VOICE] Não foi possível iniciar — Python não encontrado');
+    return;
+  }
+
   const scriptPath = path.join(__dirname, 'voice_listener.py');
-  voiceProcess = spawn('py', ['-u', scriptPath], {
+  voiceProcess = spawn(pythonCmd, ['-u', scriptPath], {
     cwd: __dirname,
     stdio: ['pipe', 'pipe', 'pipe'],
     env: { ...process.env, PYTHONUNBUFFERED: '1' }
