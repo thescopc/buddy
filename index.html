@@ -915,16 +915,14 @@
 
   // Clique no rosto = para de falar + cara de bravo
   face.addEventListener('click', () => {
-    if (window.speechSynthesis.speaking) {
-      stopSpeaking();
-      setExpression('angry');
-      // Volta ao normal depois de 2 segundos
-      setTimeout(() => {
-        if (currentExpression === 'angry') {
-          setExpression('happy');
-        }
-      }, 2000);
-    }
+    stopSpeaking();
+    setExpression('angry');
+    // Volta ao normal depois de 2 segundos
+    setTimeout(() => {
+      if (currentExpression === 'angry') {
+        setExpression('happy');
+      }
+    }, 2000);
     resetIdleTimer();
   });
 
