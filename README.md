@@ -1,12 +1,25 @@
-# 🤖 Buddy Desktop
+<p align="center">
+  <img src="docs/screenshot.png" alt="Buddy Desktop" width="280"/>
+</p>
 
-Agente de desktop autônomo com rostinho animado, reconhecimento de voz local, IA conversacional, controle do computador via MCP, memória persistente e sistema de skills.
+<h1 align="center">🤖 Buddy Desktop</h1>
+
+<p align="center">
+  <strong>Agente de desktop autônomo com rostinho animado, reconhecimento de voz local, IA conversacional, controle do computador via MCP, memória persistente e sistema de skills.</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white" alt="Electron"/>
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js"/>
+  <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/OpenAI-412991?logo=openai&logoColor=white" alt="OpenAI"/>
+</p>
 
 ---
 
 ## O que é o Buddy?
 
-Buddy é um agente virtual que fica como uma janelinha sempre visível na sua tela. Ele tem um rostinho animado com expressões, escuta sua voz, conversa com você usando IA (OpenAI), e executa tarefas completas no seu computador — criar arquivos, organizar pastas, abrir programas, agendar tarefas e muito mais.
+Buddy é um agente virtual que fica como uma janelinha sempre visível na sua tela. Ele tem um rostinho animado SVG com expressões, cabelo 3D em PNG, escuta sua voz, conversa com você usando IA (OpenAI), e executa tarefas completas no seu computador.
 
 Diferente de um chatbot simples, o Buddy é um **agente autônomo**: você dá uma tarefa e ele planeja, executa múltiplos passos, verifica resultados e só te responde quando terminou.
 
@@ -14,14 +27,33 @@ Diferente de um chatbot simples, o Buddy é um **agente autônomo**: você dá u
 
 ## Funcionalidades
 
-- 🎤 **Reconhecimento de voz local** — Vosk (wake word) + faster-whisper (transcrição). 100% offline.
-- 🤖 **Agente autônomo** — Loop agêntico com até 25 iterações. Planeja, executa e verifica.
-- 🛡️ **Proteção destrutiva** — Pede confirmação antes de escrever, apagar ou executar comandos.
-- 🧠 **Memória persistente** — Lembra do seu nome, preferências, e o que fez cada dia.
-- 📅 **Scheduler de tarefas** — Agenda tarefas pra executar em horários específicos.
-- 🔧 **Sistema de Skills** — Aprende habilidades novas via arquivos .md (Google Calendar, etc).
-- 😊 **Rostinho animado** — 7 expressões com olhos que seguem o mouse.
-- 🔊 **TTS em pt-BR** — Fala as respostas (clique no rosto pra parar).
+| | Funcionalidade | Descrição |
+|---|---|---|
+| 🎤 | **Voz local** | Vosk (wake word) + faster-whisper (transcrição). 100% offline |
+| 🤖 | **Agente autônomo** | Loop agêntico com até 25 iterações. Planeja, executa e verifica |
+| 🛡️ | **Proteção destrutiva** | Pede confirmação antes de escrever, apagar ou executar comandos |
+| 🧠 | **Memória persistente** | Lembra do seu nome, preferências, e o que fez cada dia |
+| 📅 | **Scheduler** | Agenda tarefas pra executar em horários específicos |
+| 🔧 | **Skills** | Aprende habilidades novas via arquivos .md |
+| 😊 | **Rostinho SVG** | Rosto animado com expressões + cabelo 3D em PNG |
+| 🔊 | **TTS pt-BR** | Fala as respostas (clique no rosto pra parar) |
+
+---
+
+## Expressões do Buddy
+
+O rosto do Buddy é feito em SVG com múltiplas expressões animadas:
+
+| Expressão | Quando aparece |
+|---|---|
+| 😊 **Feliz** | Estado padrão, acordado |
+| 🗣️ **Falando** | Enquanto o Buddy fala (TTS) |
+| 🤔 **Pensando** | Processando sua pergunta |
+| 😴 **Dormindo** | Após 60s sem interação (com Zzz animados) |
+| 💻 **Trabalhando** | Executando tarefas (olhos lendo) |
+| 😠 **Com raiva** | Quando você clica nele pra parar de falar |
+| 😮 **Surpreso** | Reações de surpresa |
+| 🎤 **Ouvindo** | Captando sua voz |
 
 ---
 
@@ -30,7 +62,7 @@ Diferente de um chatbot simples, o Buddy é um **agente autônomo**: você dá u
 ```
 ┌─────────────────────────────────────────────────────┐
 │                    ELECTRON (UI)                     │
-│  index.html - Rostinho animado + Chat + TTS          │
+│  index.html - Rosto SVG animado + Chat + TTS         │
 │  main.js    - Agente autônomo + Memória + Scheduler  │
 │  preload.js - Bridge seguro (IPC)                    │
 ├─────────────────────────────────────────────────────┤
@@ -69,29 +101,16 @@ Diferente de um chatbot simples, o Buddy é um **agente autônomo**: você dá u
 
 ### Setup
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/thescopc/buddy.git
-   cd buddy
-   ```
+```bash
+git clone https://github.com/thescopc/buddy.git
+cd buddy
+cp main.example.js main.js
+# Edite main.js e insira sua API Key
+npm install
+npm start
+```
 
-2. Copie o arquivo de exemplo e insira sua API Key:
-   ```bash
-   cp main.example.js main.js
-   ```
-   Edite `main.js` e substitua `SUA_OPENAI_API_KEY_AQUI` pela sua chave.
-
-3. Instale e rode:
-   ```bash
-   npm install
-   npm start
-   ```
-
-O primeiro `npm start` vai:
-- Instalar o Desktop Commander MCP em `mcp-tools/`
-- Instalar vosk, sounddevice e faster-whisper via pip
-- Baixar o modelo Whisper "base" (~150MB)
-- Criar a pasta `memory/` com arquivos padrão
+O primeiro `npm start` vai instalar automaticamente o Desktop Commander MCP, vosk, sounddevice, faster-whisper e baixar o modelo Whisper.
 
 ---
 
@@ -118,42 +137,6 @@ O primeiro `npm start` vai:
 
 ---
 
-## Sistema de Memória
-
-O Buddy lembra de tudo automaticamente:
-
-- **Personalidade** (`memory/personality.md`) — Nome, tom de voz, comportamento
-- **Usuário** (`memory/user.md`) — Seu nome, preferências (atualiza sozinho)
-- **Diário** (`memory/daily/`) — Resumo de tudo que fez por dia
-- **Tarefas** (`memory/tasks.md`) — Tarefas agendadas com horário
-
-Na primeira execução, o Buddy se apresenta e pergunta seu nome.
-
----
-
-## Skills (Plugins)
-
-Skills são arquivos `.md` na pasta `skills/` que ensinam o Buddy a fazer coisas novas.
-
-Skills incluídas:
-- `google-calendar.md` — Conectar e gerenciar Google Calendar
-- `abrir-programas.md` — Abrir sites e programas no Windows
-
-### Criando uma skill
-
-Basta criar um `.md` em `skills/` seguindo o formato:
-```markdown
-# Skill: Nome da Skill
-## Descrição
-O que essa skill faz.
-## Como Usar
-Instruções para o Buddy executar.
-```
-
-Ou peça pro próprio Buddy: *"Buddy, cria uma skill pra enviar emails"*
-
----
-
 ## Estrutura de Arquivos
 
 ```
@@ -161,13 +144,14 @@ buddy/
 ├── main.example.js      # Arquivo principal (copie como main.js)
 ├── main.js              # Seu arquivo com API Key (não versionado)
 ├── preload.js           # Bridge seguro (IPC)
-├── index.html           # Interface completa (HTML + CSS + JS)
+├── index.html           # Interface completa (SVG face + Chat + JS)
 ├── voice_listener.py    # Reconhecimento de voz (Python)
 ├── mcp-client.js        # Cliente MCP (JSON-RPC 2.0)
 ├── setup-mcp.js         # Auto-instalador do Desktop Commander
 ├── package.json         # Dependências
-├── .gitignore
-├── README.md
+├── docs/
+│   ├── screenshot.png   # Screenshot do app
+│   └── cabelo.png       # Cabelo 3D (PNG transparente)
 ├── memory/              # Memória persistente (não versionado)
 │   ├── personality.md
 │   ├── user.md
@@ -183,6 +167,14 @@ buddy/
 
 ---
 
+## Skills (Plugins)
+
+Skills são arquivos `.md` na pasta `skills/` que ensinam o Buddy a fazer coisas novas.
+
+Ou peça pro próprio Buddy: *"Buddy, cria uma skill pra enviar emails"*
+
+---
+
 ## Configuração
 
 ### Trocar modelo de IA
@@ -192,12 +184,6 @@ const OPENAI_MODEL = 'gpt-4o-mini';   // Barato e bom (padrão)
 const OPENAI_MODEL = 'gpt-4o';        // Melhor capacidade
 const OPENAI_MODEL = 'gpt-4.1';       // Mais recente
 ```
-
-### Calibrar microfone
-```bash
-py test_noise.py
-```
-Ajuste o threshold em `voice_listener.py` na função `has_sound()`.
 
 ---
 

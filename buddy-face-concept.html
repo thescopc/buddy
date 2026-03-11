@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buddy Face — Concept Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1123;
+    --card-bg: #1a1d35;
+    --accent: #e94560;
+    --accent-soft: rgba(233, 69, 96, 0.15);
+    --text: #e8e8f0;
+    --text-dim: #6b7094;
+    --skin: #ffcf9f;
+    --skin-shadow: #e8b07a;
+    --skin-highlight: #ffe4c4;
+    --eye-color: #2d2d2d;
+    --blush: #ff8fab;
+    --mouth: #c97050;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #e94560, #ff8fab, #f5c542);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-bottom: 50px;
+  }
+
+  .comparison {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .face-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 40px 50px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .face-card .label {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: white;
+    font-weight: 800;
+    font-size: 0.75rem;
+    padding: 4px 18px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .face-card .label.new {
+    background: linear-gradient(135deg, #4ecdc4, #44b09e);
+  }
+
+  /* =============================================
+     ROSTO ATUAL (CSS puro, como está hoje)
+     ============================================= */
+  .old-face-area {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 20px 0;
+  }
+
+  .old-face {
+    width: 120px;
+    height: 120px;
+    background: var(--skin);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3), inset 0 -5px 15px rgba(0,0,0,0.1);
+    animation: old-float 3s ease-in-out infinite;
+  }
+
+  @keyframes old-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .old-eye {
+    width: 18px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 38px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  .old-eye-l { left: 30px; }
+  .old-eye-r { right: 30px; }
+
+  .old-pupil {
+    width: 10px;
+    height: 12px;
+    background: var(--eye-color);
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 4px;
+    transition: all 0.15s ease;
+  }
+  .old-pupil::after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+  }
+
+  .old-blush {
+    width: 20px;
+    height: 12px;
+    background: var(--blush);
+    border-radius: 50%;
+    position: absolute;
+    top: 62px;
+    opacity: 0.5;
+  }
+  .old-blush-l { left: 14px; }
+  .old-blush-r { right: 14px; }
+
+  .old-mouth {
+    width: 24px;
+    height: 12px;
+    border-bottom: 3px solid var(--mouth);
+    border-radius: 0 0 50% 50%;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* =============================================
+     ROSTO NOVO (SVG + melhorias)
+     ============================================= */
+  .new-face-area {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 20px 0;
+  }
+
+  .new-face-container {
+    position: relative;
+    animation: new-float 4s ease-in-out infinite;
+    cursor: pointer;
+    filter: drop-shadow(0 12px 30px rgba(233, 69, 96, 0.12));
+  }
+
+  @keyframes new-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(0.5deg); }
+    50% { transform: translateY(-8px) rotate(0deg); }
+    75% { transform: translateY(-4px) rotate(-0.5deg); }
+  }
+
+  /* Glow atrás do rosto */
+  .face-glow {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  }
+
+  @keyframes angry-shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    20% { transform: translateX(-2px) rotate(-1deg); }
+    40% { transform: translateX(2px) rotate(1deg); }
+    60% { transform: translateX(-1px) rotate(-0.5deg); }
+    80% { transform: translateX(1px) rotate(0.5deg); }
+  }
+
+  /* Breathing animation no SVG */
+  .new-face-svg {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.015); }
+  }
+
+  /* Pupila nova com tracking suave */
+  .new-pupil {
+    transition: all 0.08s ease-out;
+  }
+
+  /* Blink animation */
+  .new-eye-lid {
+    transition: all 0.12s ease;
+  }
+
+  .new-face-container.blink .new-eye-lid {
+    ry: 1;
+  }
+
+  /* Mouth animation for talking */
+  .new-face-container.talking .mouth-shape {
+    animation: new-talk 0.3s ease-in-out infinite alternate;
+  }
+
+  @keyframes new-talk {
+    0% { ry: 4; rx: 6; }
+    100% { ry: 7; rx: 5; }
+  }
+
+  /* Partículas novas ao redor */
+  .new-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .n-particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: sparkle 3s ease-in-out infinite;
+  }
+
+  @keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0.5) translateY(0); }
+    50% { opacity: 1; transform: scale(1) translateY(-8px); }
+  }
+
+  /* =============================================
+     EXPRESSÕES DEMO
+     ============================================= */
+  .expressions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .expr-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .expr-btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .expr-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* =============================================
+     FEATURES LIST
+     ============================================= */
+  .features {
+    margin-top: 60px;
+    max-width: 700px;
+    width: 100%;
+  }
+
+  .features h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--text);
+    text-align: center;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .feature-item {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .feature-item .emoji {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .feature-item h3 {
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+
+  .feature-item p {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .diff-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .diff-tag.before {
+    background: rgba(255, 80, 80, 0.15);
+    color: #ff6b6b;
+  }
+
+  .diff-tag.after {
+    background: rgba(78, 205, 196, 0.15);
+    color: #4ecdc4;
+  }
+</style>
+</head>
+<body>
+
+<h1>Buddy Face Redesign</h1>
+<p class="subtitle">Comparação lado a lado — atual vs. proposta</p>
+
+<div class="comparison">
+  <!-- ROSTO ATUAL -->
+  <div class="face-card">
+    <div class="label">Atual</div>
+    <div class="old-face-area">
+      <div class="old-face" id="old-face">
+        <div class="old-eye old-eye-l">
+          <div class="old-pupil" id="old-pupil-l"></div>
+        </div>
+        <div class="old-eye old-eye-r">
+          <div class="old-pupil" id="old-pupil-r"></div>
+        </div>
+        <div class="old-blush old-blush-l"></div>
+        <div class="old-blush old-blush-r"></div>
+        <div class="old-mouth" id="old-mouth"></div>
+      </div>
+    </div>
+    <div class="expressions-row">
+      <button class="expr-btn active" onclick="setOldExpr('happy')">😊 Feliz</button>
+      <button class="expr-btn" onclick="setOldExpr('thinking')">🤔 Pensando</button>
+      <button class="expr-btn" onclick="setOldExpr('sleeping')">😴 Dormindo</button>
+    </div>
+  </div>
+
+  <!-- ROSTO NOVO -->
+  <div class="face-card">
+    <div class="label new">Proposta</div>
+    <div class="new-face-area">
+      <!-- Particles -->
+      <div class="new-particles">
+        <div class="n-particle" style="width:5px;height:5px;background:#e94560;top:10%;left:15%;animation-delay:0s;"></div>
+        <div class="n-particle" style="width:4px;height:4px;background:#f5c542;top:8%;right:20%;animation-delay:0.8s;"></div>
+        <div class="n-particle" style="width:6px;height:6px;background:#4ecdc4;bottom:15%;left:10%;animation-delay:1.5s;"></div>
+        <div class="n-particle" style="width:3px;height:3px;background:#ff8fab;bottom:10%;right:15%;animation-delay:0.4s;"></div>
+        <div class="n-particle" style="width:4px;height:4px;background:#a78bfa;top:25%;right:8%;animation-delay:2s;"></div>
+      </div>
+
+      <div class="face-glow"></div>
+
+      <div class="new-face-container" id="new-face">
+        <svg class="new-face-svg" width="140" height="175" viewBox="-2 -16 144 175" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Gradiente da pele -->
+            <radialGradient id="skin-grad" cx="50%" cy="40%" r="55%">
+              <stop offset="0%" stop-color="#ffe8cc"/>
+              <stop offset="60%" stop-color="#ffcf9f"/>
+              <stop offset="100%" stop-color="#e8b07a"/>
+            </radialGradient>
+
+            <!-- Sombra interna suave -->
+            <radialGradient id="skin-shadow" cx="50%" cy="85%" r="50%">
+              <stop offset="0%" stop-color="rgba(180, 120, 70, 0.15)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+
+            <!-- Brilho no topo -->
+            <radialGradient id="skin-highlight" cx="45%" cy="25%" r="35%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.3)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+
+            <!-- Gradiente do olho -->
+            <radialGradient id="eye-bg" cx="50%" cy="40%" r="50%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#e8e5f0"/>
+            </radialGradient>
+
+            <!-- Gradiente da pupila -->
+            <radialGradient id="pupil-grad" cx="40%" cy="35%" r="50%">
+              <stop offset="0%" stop-color="#4a4a5a"/>
+              <stop offset="100%" stop-color="#1a1a24"/>
+            </radialGradient>
+
+            <!-- Sombra do olho -->
+            <filter id="eye-shadow">
+              <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="rgba(0,0,0,0.12)"/>
+            </filter>
+
+            <!-- Sombra geral -->
+            <filter id="face-shadow">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="rgba(0,0,0,0.2)"/>
+            </filter>
+
+            <!-- Blush gradient -->
+            <radialGradient id="blush-grad-l" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(255, 143, 171, 0.6)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+            <radialGradient id="blush-grad-r" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(255, 143, 171, 0.6)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+
+          <!-- FORMA DO ROSTO -->
+          <g filter="url(#face-shadow)">
+            <ellipse cx="70" cy="75" rx="60" ry="62" fill="url(#skin-grad)"/>
+            <ellipse cx="70" cy="75" rx="60" ry="62" fill="url(#skin-shadow)"/>
+            <ellipse cx="70" cy="75" rx="60" ry="62" fill="url(#skin-highlight)"/>
+          </g>
+
+          <!-- OLHO ESQUERDO -->
+          <g filter="url(#eye-shadow)">
+            <ellipse class="new-eye-shape" id="eye-l-bg" cx="44" cy="72" rx="14" ry="16" fill="url(#eye-bg)"/>
+          </g>
+          <circle class="new-iris" id="iris-l" cx="44" cy="73" r="7" fill="#3a3a4a"/>
+          <circle class="new-pupil" id="pupil-l" cx="44" cy="73" r="4.5" fill="url(#pupil-grad)"/>
+          <circle cx="47" cy="70" r="2.5" fill="white" opacity="0.9"/>
+          <circle cx="41" cy="77" r="1.2" fill="white" opacity="0.5"/>
+
+          <!-- OLHO DIREITO -->
+          <g filter="url(#eye-shadow)">
+            <ellipse class="new-eye-shape" id="eye-r-bg" cx="96" cy="72" rx="14" ry="16" fill="url(#eye-bg)"/>
+          </g>
+          <circle class="new-iris" id="iris-r" cx="96" cy="73" r="7" fill="#3a3a4a"/>
+          <circle class="new-pupil" id="pupil-r" cx="96" cy="73" r="4.5" fill="url(#pupil-grad)"/>
+          <circle cx="99" cy="70" r="2.5" fill="white" opacity="0.9"/>
+          <circle cx="93" cy="77" r="1.2" fill="white" opacity="0.5"/>
+
+          <!-- BOCHECHAS -->
+          <ellipse cx="22" cy="90" rx="14" ry="9" fill="url(#blush-grad-l)" id="blush-l"/>
+          <ellipse cx="118" cy="90" rx="14" ry="9" fill="url(#blush-grad-r)" id="blush-r"/>
+
+          <!-- BOCA -->
+          <path id="new-mouth" d="M 52 102 Q 60 116, 70 116 Q 80 116, 88 102" 
+                stroke="#c97050" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+
+          <!-- Nariz sutil -->
+          <ellipse cx="70" cy="90" rx="3" ry="2" fill="#e8b888" opacity="0.4"/>
+
+          <!-- CABELO (imagem PNG sobreposta ao rosto) -->
+          <image id="new-hair" href="cabelo.png" x="8" y="-7" width="123" height="84" preserveAspectRatio="xMidYMid meet"/>
+        </svg>
+      </div>
+    </div>
+    <div class="expressions-row" id="new-expr-btns">
+      <button class="expr-btn active" onclick="setNewExpr('happy')">😊 Feliz</button>
+      <button class="expr-btn" onclick="setNewExpr('thinking')">🤔 Pensando</button>
+      <button class="expr-btn" onclick="setNewExpr('talking')">🗣️ Falando</button>
+      <button class="expr-btn" onclick="setNewExpr('sleeping')">😴 Dormindo</button>
+      <button class="expr-btn" onclick="setNewExpr('working')">💻 Trabalhando</button>
+      <button class="expr-btn" onclick="setNewExpr('angry')">😠 Com Raiva</button>
+    </div>
+  </div>
+</div>
+
+<!-- LISTA DE MELHORIAS -->
+<div class="features">
+  <h2>O que muda?</h2>
+  <div class="features-grid">
+    <div class="feature-item">
+      <span class="emoji">🎨</span>
+      <h3>Forma do rosto <span class="diff-tag before">Círculo</span> <span class="diff-tag after">Oval orgânico</span></h3>
+      <p>Troca o border-radius: 50% por uma elipse SVG com proporções mais naturais e orelhinhas laterais fofas.</p>
+    </div>
+    <div class="feature-item">
+      <span class="emoji">👁️</span>
+      <h3>Olhos com profundidade <span class="diff-tag before">Flat</span> <span class="diff-tag after">Gradiente + brilhos</span></h3>
+      <p>Íris com gradiente, 2 pontos de brilho (principal + secundário), sombra suave. Pupilas com inércia ao seguir o mouse.</p>
+    </div>
+    <div class="feature-item">
+      <span class="emoji">😊</span>
+      <h3>Boca expressiva <span class="diff-tag before">Border CSS</span> <span class="diff-tag after">Curva Bézier SVG</span></h3>
+      <p>Path SVG permite transições suaves entre sorriso, fala, surpresa, tristeza — impossível com border-radius.</p>
+    </div>
+    <div class="feature-item">
+      <span class="emoji">✨</span>
+      <h3>Pele com volume <span class="diff-tag before">Cor sólida</span> <span class="diff-tag after">3 camadas</span></h3>
+      <p>Gradiente radial de pele + sombra inferior + highlight superior = sensação de 3D sem ser pesado.</p>
+    </div>
+    <div class="feature-item">
+      <span class="emoji">🫧</span>
+      <h3>Bochechas difusas <span class="diff-tag before">Elipse sólida</span> <span class="diff-tag after">Gradiente radial</span></h3>
+      <p>Blush com fade natural nas bordas, parece rubor de verdade ao invés de adesivo colado.</p>
+    </div>
+    <div class="feature-item">
+      <span class="emoji">🌊</span>
+      <h3>Float orgânico <span class="diff-tag before">Sobe/desce</span> <span class="diff-tag after">Sway + respiração</span></h3>
+      <p>Animação de flutuação com micro-rotação e scale de respiração combinados, movimento mais vivo.</p>
+    </div>
+    <div class="feature-item">
+      <span class="emoji">💫</span>
+      <h3>Glow de aura <span class="diff-tag before">Nenhum</span> <span class="diff-tag after">Pulso suave</span></h3>
+      <p>Halo sutil atrás do rosto que pulsa, dando sensação de "presença" e energia ao personagem.</p>
+    </div>
+    <div class="feature-item">
+      <span class="emoji">💇</span>
+      <h3>Cabelo estiloso <span class="diff-tag before">Nenhum</span> <span class="diff-tag after">Mechas com volume</span></h3>
+      <p>Cabelo com mechas bagunçadas caindo na testa, fios soltos e brilho. Dá identidade única ao personagem.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================
+// ROSTO ANTIGO — eye tracking
+// ========================
+document.addEventListener('mousemove', (e) => {
+  // Old face pupils
+  const oldFace = document.getElementById('old-face');
+  if (oldFace) {
+    const rect = oldFace.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / window.innerWidth * 6;
+    const dy = (e.clientY - cy) / window.innerHeight * 4;
+    document.getElementById('old-pupil-l').style.transform = `translate(${dx}px, ${dy}px)`;
+    document.getElementById('old-pupil-r').style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+
+  // New face pupils (SVG)
+  const newFace = document.getElementById('new-face');
+  if (newFace) {
+    const rect = newFace.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const maxMove = 4;
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+    const dist = Math.min(Math.hypot(e.clientX - cx, e.clientY - cy) / 200, 1);
+    const dx = Math.cos(angle) * maxMove * dist;
+    const dy = Math.sin(angle) * maxMove * dist;
+
+    // Pupilas
+    document.getElementById('pupil-l').setAttribute('cx', 44 + dx);
+    document.getElementById('pupil-l').setAttribute('cy', 73 + dy);
+    document.getElementById('iris-l').setAttribute('cx', 44 + dx);
+    document.getElementById('iris-l').setAttribute('cy', 73 + dy);
+
+    document.getElementById('pupil-r').setAttribute('cx', 96 + dx);
+    document.getElementById('pupil-r').setAttribute('cy', 73 + dy);
+    document.getElementById('iris-r').setAttribute('cx', 96 + dx);
+    document.getElementById('iris-r').setAttribute('cy', 73 + dy);
+  }
+});
+
+// ========================
+// ROSTO ANTIGO — expressões
+// ========================
+function setOldExpr(expr) {
+  const face = document.getElementById('old-face');
+  const mouth = document.getElementById('old-mouth');
+  const eyes = face.querySelectorAll('.old-eye');
+  const pupils = face.querySelectorAll('.old-pupil');
+  const blushes = face.querySelectorAll('.old-blush');
+
+  // Reset
+  eyes.forEach(e => { e.style = ''; });
+  pupils.forEach(p => { p.style.display = ''; });
+  mouth.style = '';
+  blushes.forEach(b => { b.style.opacity = '0.5'; });
+
+  if (expr === 'happy') {
+    mouth.style.height = '16px';
+    mouth.style.width = '28px';
+    mouth.style.borderBottom = '4px solid #c97050';
+    blushes.forEach(b => { b.style.opacity = '0.8'; });
+  } else if (expr === 'thinking') {
+    mouth.style.width = '10px';
+    mouth.style.height = '10px';
+    mouth.style.border = '3px solid #c97050';
+    mouth.style.borderRadius = '50%';
+    eyes.forEach(e => { e.style.animation = 'lookUpOld 1s ease-in-out infinite alternate'; });
+  } else if (expr === 'sleeping') {
+    eyes.forEach(e => {
+      e.style.height = '4px';
+      e.style.top = '46px';
+      e.style.borderRadius = '0 0 50% 50%';
+      e.style.background = '#2d2d2d';
+    });
+    pupils.forEach(p => { p.style.display = 'none'; });
+    mouth.style.width = '14px';
+    mouth.style.height = '8px';
+    mouth.style.border = '2px solid #c97050';
+    mouth.style.borderRadius = '50%';
+  }
+
+  // Active button
+  document.querySelectorAll('.face-card:first-child .expr-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ========================
+// ROSTO NOVO — expressões
+// ========================
+let talkInterval = null;
+
+function setNewExpr(expr) {
+  const mouth = document.getElementById('new-mouth');
+  const eyeLBg = document.getElementById('eye-l-bg');
+  const eyeRBg = document.getElementById('eye-r-bg');
+  const irisL = document.getElementById('iris-l');
+  const irisR = document.getElementById('iris-r');
+  const pupilL = document.getElementById('pupil-l');
+  const pupilR = document.getElementById('pupil-r');
+  const blushL = document.getElementById('blush-l');
+  const blushR = document.getElementById('blush-r');
+  const container = document.getElementById('new-face');
+
+  // Clear talk
+  if (talkInterval) { clearInterval(talkInterval); talkInterval = null; }
+  container.classList.remove('talking');
+
+  // Reset all
+  eyeLBg.setAttribute('ry', '16');
+  eyeRBg.setAttribute('ry', '16');
+  eyeLBg.setAttribute('rx', '14');
+  eyeRBg.setAttribute('rx', '14');
+  eyeLBg.setAttribute('fill', 'url(#eye-bg)');
+  eyeRBg.setAttribute('fill', 'url(#eye-bg)');
+  irisL.style.display = '';
+  irisR.style.display = '';
+  pupilL.style.display = '';
+  pupilR.style.display = '';
+  blushL.style.opacity = '';
+  blushR.style.opacity = '';
+  // Remove elementos extras de expressões anteriores
+  document.querySelectorAll('.expr-extra').forEach(el => el.remove());
+  // Restaurar brilhos escondidos
+  container.querySelectorAll('.expr-extra-hide').forEach(c => {
+    c.setAttribute('opacity', c.getAttribute('data-orig-opacity') || '0.9');
+    c.classList.remove('expr-extra-hide');
+  });
+  // Reset container animations
+  container.style.animation = '';
+  // Reset iris/pupil sizes
+  irisL.setAttribute('r', '7');
+  irisR.setAttribute('r', '7');
+  pupilL.setAttribute('r', '4.5');
+  pupilR.setAttribute('r', '4.5');
+  // Reset iris positions
+  irisL.setAttribute('cx', '44');
+  irisR.setAttribute('cx', '96');
+  pupilL.setAttribute('cx', '44');
+  pupilR.setAttribute('cx', '96');
+  irisL.setAttribute('cy', '73');
+  irisR.setAttribute('cy', '73');
+  pupilL.setAttribute('cy', '73');
+  pupilR.setAttribute('cy', '73');
+  // Reset blush color
+  blushL.setAttribute('fill', 'url(#blush-grad-l)');
+  blushR.setAttribute('fill', 'url(#blush-grad-r)');
+
+  // Smooth mouth transition
+  mouth.style.transition = 'all 0.4s ease';
+
+  if (expr === 'happy') {
+    mouth.setAttribute('d', 'M 52 102 Q 60 116, 70 116 Q 80 116, 88 102');
+    mouth.setAttribute('stroke-width', '2.8');
+    mouth.setAttribute('fill', 'none');
+    blushL.style.opacity = '1';
+    blushR.style.opacity = '1';
+  }
+  else if (expr === 'thinking') {
+    mouth.setAttribute('d', 'M 58 108 Q 64 104, 70 106 Q 76 108, 82 104');
+    mouth.setAttribute('stroke-width', '2.5');
+    mouth.setAttribute('fill', 'none');
+    // Olhos olham pra cima
+    irisL.setAttribute('cy', '69');
+    pupilL.setAttribute('cy', '69');
+    irisR.setAttribute('cy', '69');
+    pupilR.setAttribute('cy', '69');
+  }
+  else if (expr === 'talking') {
+    let open = true;
+    talkInterval = setInterval(() => {
+      if (open) {
+        mouth.setAttribute('d', 'M 55 102 Q 62 118, 70 118 Q 78 118, 85 102');
+        mouth.setAttribute('fill', 'rgba(180, 100, 60, 0.15)');
+      } else {
+        mouth.setAttribute('d', 'M 58 104 Q 64 110, 70 110 Q 76 110, 82 104');
+        mouth.setAttribute('fill', 'none');
+      }
+      open = !open;
+    }, 250);
+  }
+  else if (expr === 'sleeping') {
+    // Olhos fechados - linhas pretas (pálpebras fechadas)
+    eyeLBg.setAttribute('ry', '2');
+    eyeRBg.setAttribute('ry', '2');
+    eyeLBg.setAttribute('fill', '#2d2d2d');
+    eyeRBg.setAttribute('fill', '#2d2d2d');
+    irisL.style.display = 'none';
+    irisR.style.display = 'none';
+    pupilL.style.display = 'none';
+    pupilR.style.display = 'none';
+    // Esconder brilhos dos olhos
+    container.querySelectorAll('circle[cx="47"], circle[cx="41"], circle[cx="99"], circle[cx="93"]').forEach(c => {
+      c.setAttribute('data-orig-opacity', c.getAttribute('opacity'));
+      c.setAttribute('opacity', '0');
+      c.classList.add('expr-extra-hide');
+    });
+    // Boca de roncando (abre e fecha)
+    let snoreOpen = false;
+    talkInterval = setInterval(() => {
+      if (snoreOpen) {
+        mouth.setAttribute('d', 'M 60 106 Q 65 114, 70 114 Q 75 114, 80 106');
+        mouth.setAttribute('fill', 'rgba(160, 90, 50, 0.15)');
+        mouth.setAttribute('stroke-width', '2.5');
+      } else {
+        mouth.setAttribute('d', 'M 62 108 Q 66 112, 70 112 Q 74 112, 78 108');
+        mouth.setAttribute('fill', 'none');
+        mouth.setAttribute('stroke-width', '2');
+      }
+      snoreOpen = !snoreOpen;
+    }, 800);
+    blushL.style.opacity = '0.3';
+    blushR.style.opacity = '0.3';
+    // Zzz flutuando
+    const svg = container.querySelector('svg');
+    const zzz = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    zzz.classList.add('expr-extra');
+    zzz.innerHTML = `
+      <text x="115" y="40" font-family="Nunito, sans-serif" font-weight="800" font-size="14" fill="#8892b0" opacity="0.8">
+        Z
+        <animate attributeName="y" values="40;28;40" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+      </text>
+      <text x="125" y="25" font-family="Nunito, sans-serif" font-weight="800" font-size="10" fill="#8892b0" opacity="0.5">
+        z
+        <animate attributeName="y" values="25;15;25" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite"/>
+      </text>
+      <text x="130" y="14" font-family="Nunito, sans-serif" font-weight="800" font-size="7" fill="#8892b0" opacity="0.3">
+        z
+        <animate attributeName="y" values="14;6;14" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite"/>
+      </text>
+    `;
+    svg.appendChild(zzz);
+  }
+  else if (expr === 'working') {
+    // Olhos semi-cerrados (concentrado lendo)
+    eyeLBg.setAttribute('ry', '12');
+    eyeRBg.setAttribute('ry', '12');
+    // Boca reta (concentrado)
+    mouth.setAttribute('d', 'M 56 108 L 84 108');
+    mouth.setAttribute('stroke-width', '2.5');
+    mouth.setAttribute('fill', 'none');
+    blushL.style.opacity = '0.2';
+    blushR.style.opacity = '0.2';
+    // Animação de leitura - olhos se movem de um lado pro outro
+    let readPos = 0;
+    let readDir = 1;
+    talkInterval = setInterval(() => {
+      readPos += readDir * 0.8;
+      if (readPos > 4) { readDir = -1; }
+      if (readPos < -4) { readDir = 1; }
+      irisL.setAttribute('cx', 44 + readPos);
+      pupilL.setAttribute('cx', 44 + readPos);
+      irisR.setAttribute('cx', 96 + readPos);
+      pupilR.setAttribute('cx', 96 + readPos);
+    }, 50);
+    // Gotinha de suor
+    const svg = container.querySelector('svg');
+    const sweat = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    sweat.classList.add('expr-extra');
+    sweat.innerHTML = `
+      <ellipse cx="124" cy="52" rx="4" ry="5" fill="rgba(100,180,255,0.5)">
+        <animate attributeName="cy" values="52;60;52" dur="1.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.5;0.8;0.5" dur="1.5s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="124" cy="48" rx="2.5" ry="2" fill="rgba(100,180,255,0.3)"/>
+    `;
+    svg.appendChild(sweat);
+  }
+  else if (expr === 'angry') {
+    // Olhos apertados (irritado) - mais achatados
+    eyeLBg.setAttribute('ry', '10');
+    eyeRBg.setAttribute('ry', '10');
+    // Pupilas menores (raiva)
+    irisL.setAttribute('r', '5');
+    pupilL.setAttribute('r', '3');
+    irisR.setAttribute('r', '5');
+    pupilR.setAttribute('r', '3');
+    // Boca de bravo (curvada pra baixo)
+    mouth.setAttribute('d', 'M 52 112 Q 60 104, 70 104 Q 80 104, 88 112');
+    mouth.setAttribute('stroke-width', '3');
+    mouth.setAttribute('fill', 'none');
+    blushL.style.opacity = '0.8';
+    blushR.style.opacity = '0.8';
+    // Bochechas ficam vermelhas de raiva
+    blushL.setAttribute('fill', 'rgba(255, 80, 80, 0.5)');
+    blushR.setAttribute('fill', 'rgba(255, 80, 80, 0.5)');
+    // Sobrancelhas de raiva (V invertido)
+    const svg = container.querySelector('svg');
+    const brows = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    brows.classList.add('expr-extra');
+    brows.innerHTML = `
+      <path d="M 30 60 L 52 66" stroke="#8B5E3C" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 110 60 L 88 66" stroke="#8B5E3C" stroke-width="3" stroke-linecap="round"/>
+    `;
+    svg.appendChild(brows);
+    // Tremidinha de raiva
+    container.style.animation = 'angry-shake 0.3s ease-in-out infinite';
+  }
+
+  // Active button
+  document.querySelectorAll('#new-expr-btns .expr-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ========================
+// BLINK automático (rosto novo)
+// ========================
+function newBlink() {
+  const eyeLBg = document.getElementById('eye-l-bg');
+  const eyeRBg = document.getElementById('eye-r-bg');
+  const irisL = document.getElementById('iris-l');
+  const irisR = document.getElementById('iris-r');
+  const pupilL = document.getElementById('pupil-l');
+  const pupilR = document.getElementById('pupil-r');
+
+  // Só pisca se olhos estão abertos
+  if (eyeLBg.getAttribute('ry') < 5) return;
+
+  const origRy = eyeLBg.getAttribute('ry');
+  eyeLBg.style.transition = 'ry 0.08s ease';
+  eyeRBg.style.transition = 'ry 0.08s ease';
+
+  eyeLBg.setAttribute('ry', '2');
+  eyeRBg.setAttribute('ry', '2');
+  irisL.style.opacity = '0';
+  irisR.style.opacity = '0';
+  pupilL.style.opacity = '0';
+  pupilR.style.opacity = '0';
+
+  setTimeout(() => {
+    eyeLBg.setAttribute('ry', origRy);
+    eyeRBg.setAttribute('ry', origRy);
+    irisL.style.opacity = '1';
+    irisR.style.opacity = '1';
+    pupilL.style.opacity = '1';
+    pupilR.style.opacity = '1';
+  }, 120);
+}
+
+setInterval(() => {
+  newBlink();
+}, 3000 + Math.random() * 3000);
+</script>
+
+</body>
+</html>
