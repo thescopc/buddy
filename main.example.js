@@ -447,7 +447,7 @@ ipcMain.on('close-app', () => {
   if (mcpClient) mcpClient.stop();
   app.quit();
 });
-ipcMain.on('minimize-app', () => { mainWindow.hide(); });
+ipcMain.on('minimize-app', () => { mainWindow.minimize(); });
 
 // ============================================================
 // AGENT CONFIG
