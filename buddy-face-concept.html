@@ -180,7 +180,7 @@
      ============================================= */
   .new-face-area {
     width: 200px;
-    height: 200px;
+    height: 240px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -432,7 +432,7 @@
       <div class="face-glow"></div>
 
       <div class="new-face-container" id="new-face">
-        <svg class="new-face-svg" width="140" height="175" viewBox="-2 -16 144 175" xmlns="http://www.w3.org/2000/svg">
+        <svg class="new-face-svg" width="140" height="210" viewBox="-2 -55 144 210" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <!-- Gradiente da pele -->
             <radialGradient id="skin-grad" cx="50%" cy="40%" r="55%">
@@ -486,6 +486,63 @@
             </radialGradient>
           </defs>
 
+          <!-- ANTENA (sai do centro, curva em U pro lado esquerdo) -->
+          <g id="buddy-antenna">
+            <!-- Haste - sobe reta do centro e curva em U -->
+            <path id="antenna-stem" d="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+                  stroke="#5a5a6a" stroke-width="3.5" fill="none" stroke-linecap="round">
+              <animate attributeName="d" 
+                values="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34;
+                        M 70 18 Q 70 -13, 64 -26 Q 56 -42, 38 -38;
+                        M 70 18 Q 70 -8, 68 -22 Q 62 -36, 45 -32;
+                        M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+                dur="3s" repeatCount="indefinite"/>
+            </path>
+            <!-- Brilho metálico -->
+            <path d="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+                  stroke="rgba(255,255,255,0.12)" stroke-width="1.2" fill="none" stroke-linecap="round">
+              <animate attributeName="d" 
+                values="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34;
+                        M 70 18 Q 70 -13, 64 -26 Q 56 -42, 38 -38;
+                        M 70 18 Q 70 -8, 68 -22 Q 62 -36, 45 -32;
+                        M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+                dur="3s" repeatCount="indefinite"/>
+            </path>
+            <!-- Juntas articuladas -->
+            <circle cx="69" cy="-14" r="2.5" fill="#4a4a58">
+              <animate attributeName="cy" values="-14;-17;-12;-14" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="58" cy="-32" r="2.5" fill="#4a4a58">
+              <animate attributeName="cx" values="58;54;60;58" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="cy" values="-32;-36;-30;-32" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            
+            <!-- Ponta da antena - orbe tecnológica -->
+            <g id="antenna-orb">
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; -4 -4; 3 2; 0 0" dur="3s" repeatCount="indefinite"/>
+              <!-- Glow externo -->
+              <circle id="antenna-glow" cx="42" cy="-34" r="12" fill="rgba(78, 205, 196, 0.2)">
+                <animate attributeName="r" values="12;16;12" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <!-- Orbe base -->
+              <circle cx="42" cy="-34" r="7" fill="#3a3a4a"/>
+              <!-- Orbe interior (muda de cor) -->
+              <circle id="antenna-light" cx="42" cy="-34" r="5.5" fill="#4ecdc4">
+                <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite"/>
+              </circle>
+              <!-- Anel tech rotativo -->
+              <circle cx="42" cy="-34" r="7" fill="none" stroke="#6a6a7a" stroke-width="1"/>
+              <circle cx="42" cy="-34" r="9" fill="none" stroke="rgba(78,205,196,0.3)" stroke-width="0.5" stroke-dasharray="3 2">
+                <animateTransform attributeName="transform" type="rotate" values="0 42 -34;360 42 -34" dur="6s" repeatCount="indefinite"/>
+              </circle>
+              <!-- Brilhos -->
+              <circle cx="40" cy="-36" r="2" fill="white" opacity="0.6"/>
+              <circle cx="44" cy="-32" r="1" fill="white" opacity="0.3"/>
+            </g>
+          </g>
+
           <!-- FORMA DO ROSTO -->
           <g filter="url(#face-shadow)">
             <ellipse cx="70" cy="75" rx="60" ry="62" fill="url(#skin-grad)"/>
@@ -523,7 +580,7 @@
           <ellipse cx="70" cy="90" rx="3" ry="2" fill="#e8b888" opacity="0.4"/>
 
           <!-- CABELO (imagem PNG sobreposta ao rosto) -->
-          <image id="new-hair" href="cabelo.png" x="8" y="-7" width="123" height="84" preserveAspectRatio="xMidYMid meet"/>
+          <image id="new-hair" href="docs/cabelo.png" x="8" y="-7" width="123" height="84" preserveAspectRatio="xMidYMid meet"/>
         </svg>
       </div>
     </div>
@@ -715,6 +772,13 @@ function setNewExpr(expr) {
     c.setAttribute('opacity', c.getAttribute('data-orig-opacity') || '0.9');
     c.classList.remove('expr-extra-hide');
   });
+  // Reset antena (cor padrão: ciano tech)
+  const antennaLight = document.getElementById('antenna-light');
+  const antennaGlow = document.getElementById('antenna-glow');
+  if (antennaLight) {
+    antennaLight.setAttribute('fill', '#4ecdc4');
+    antennaGlow.setAttribute('fill', 'rgba(78, 205, 196, 0.2)');
+  }
   // Reset container animations
   container.style.animation = '';
   // Reset iris/pupil sizes
@@ -887,6 +951,23 @@ function setNewExpr(expr) {
     svg.appendChild(brows);
     // Tremidinha de raiva
     container.style.animation = 'angry-shake 0.3s ease-in-out infinite';
+  }
+
+  // === COR DA ANTENA POR EXPRESSÃO ===
+  const aLight = document.getElementById('antenna-light');
+  const aGlow = document.getElementById('antenna-glow');
+  if (aLight && aGlow) {
+    const antennaColors = {
+      'happy':    { light: '#4ecdc4', glow: 'rgba(78, 205, 196, 0.25)' },      // ciano tech - idle
+      'thinking': { light: '#a78bfa', glow: 'rgba(167, 139, 250, 0.25)' },     // roxo - processando
+      'talking':  { light: '#3b82f6', glow: 'rgba(59, 130, 246, 0.3)' },       // azul - comunicação
+      'sleeping': { light: '#374151', glow: 'rgba(55, 65, 81, 0.1)' },         // cinza apagado
+      'working':  { light: '#f59e0b', glow: 'rgba(245, 158, 11, 0.3)' },      // âmbar - atividade
+      'angry':    { light: '#ef4444', glow: 'rgba(239, 68, 68, 0.35)' },       // vermelho - alerta
+    };
+    const colors = antennaColors[expr] || antennaColors['happy'];
+    aLight.setAttribute('fill', colors.light);
+    aGlow.setAttribute('fill', colors.glow);
   }
 
   // Active button

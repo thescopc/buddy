@@ -99,7 +99,7 @@
        AREA DO ROSTO (SVG)
        ============================================================ */
     #face-area {
-      height: 170px;
+      height: 190px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -510,7 +510,7 @@
     <div class="face-glow"></div>
 
     <div class="face-container" id="buddy-face">
-      <svg class="face-svg" width="140" height="175" viewBox="-2 -16 144 175" xmlns="http://www.w3.org/2000/svg">
+      <svg class="face-svg" width="140" height="210" viewBox="-2 -55 144 210" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="skin-grad" cx="50%" cy="40%" r="55%">
             <stop offset="0%" stop-color="#ffe8cc"/>
@@ -549,6 +549,54 @@
           </radialGradient>
         </defs>
 
+        <!-- ANTENA (sai do centro, curva em U pro lado esquerdo) -->
+        <g id="buddy-antenna">
+          <path id="antenna-stem" d="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+                stroke="#5a5a6a" stroke-width="3.5" fill="none" stroke-linecap="round">
+            <animate attributeName="d" 
+              values="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34;
+                      M 70 18 Q 70 -13, 64 -26 Q 56 -42, 38 -38;
+                      M 70 18 Q 70 -8, 68 -22 Q 62 -36, 45 -32;
+                      M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+              dur="3s" repeatCount="indefinite"/>
+          </path>
+          <path d="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+                stroke="rgba(255,255,255,0.12)" stroke-width="1.2" fill="none" stroke-linecap="round">
+            <animate attributeName="d" 
+              values="M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34;
+                      M 70 18 Q 70 -13, 64 -26 Q 56 -42, 38 -38;
+                      M 70 18 Q 70 -8, 68 -22 Q 62 -36, 45 -32;
+                      M 70 18 Q 70 -10, 66 -24 Q 60 -38, 42 -34" 
+              dur="3s" repeatCount="indefinite"/>
+          </path>
+          <!-- Juntas -->
+          <circle cx="69" cy="-14" r="2.5" fill="#4a4a58">
+            <animate attributeName="cy" values="-14;-17;-12;-14" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="58" cy="-32" r="2.5" fill="#4a4a58">
+            <animate attributeName="cx" values="58;54;60;58" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="cy" values="-32;-36;-30;-32" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Orbe -->
+          <g id="antenna-orb">
+            <animateTransform attributeName="transform" type="translate" values="0 0; -4 -4; 3 2; 0 0" dur="3s" repeatCount="indefinite"/>
+            <circle id="antenna-glow" cx="42" cy="-34" r="12" fill="rgba(78,205,196,0.2)">
+              <animate attributeName="r" values="12;16;12" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="42" cy="-34" r="7" fill="#3a3a4a"/>
+            <circle id="antenna-light" cx="42" cy="-34" r="5.5" fill="#4ecdc4">
+              <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="42" cy="-34" r="7" fill="none" stroke="#6a6a7a" stroke-width="1"/>
+            <circle cx="42" cy="-34" r="9" fill="none" stroke="rgba(78,205,196,0.3)" stroke-width="0.5" stroke-dasharray="3 2">
+              <animateTransform attributeName="transform" type="rotate" values="0 42 -34;360 42 -34" dur="6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="40" cy="-36" r="2" fill="white" opacity="0.6"/>
+            <circle cx="44" cy="-32" r="1" fill="white" opacity="0.3"/>
+          </g>
+        </g>
+
         <!-- ROSTO -->
         <g filter="url(#face-shadow)">
           <ellipse cx="70" cy="75" rx="60" ry="62" fill="url(#skin-grad)"/>
@@ -582,6 +630,7 @@
         <path id="buddy-mouth" d="M 52 102 Q 60 116, 70 116 Q 80 116, 88 102"
               stroke="#c97050" stroke-width="2.8" fill="none" stroke-linecap="round"/>
 
+        <!-- NARIZ -->
         <!-- NARIZ -->
         <ellipse cx="70" cy="90" rx="3" ry="2" fill="#e8b888" opacity="0.4"/>
 
@@ -860,6 +909,25 @@
       'blinking': currentExpression
     };
     if (statusMap[expr]) status.textContent = statusMap[expr];
+
+    // Cor da antena por expressão
+    const aLight = document.getElementById('antenna-light');
+    const aGlow = document.getElementById('antenna-glow');
+    if (aLight && aGlow) {
+      const ac = {
+        'happy':    { l: '#4ecdc4', g: 'rgba(78,205,196,0.25)' },
+        'thinking': { l: '#a78bfa', g: 'rgba(167,139,250,0.25)' },
+        'talking':  { l: '#3b82f6', g: 'rgba(59,130,246,0.3)' },
+        'sleeping': { l: '#374151', g: 'rgba(55,65,81,0.1)' },
+        'working':  { l: '#f59e0b', g: 'rgba(245,158,11,0.3)' },
+        'angry':    { l: '#ef4444', g: 'rgba(239,68,68,0.35)' },
+        'surprised':{ l: '#f5c542', g: 'rgba(245,197,66,0.3)' },
+        'listening':{ l: '#34d399', g: 'rgba(52,211,153,0.3)' },
+      };
+      const c = ac[expr] || ac['happy'];
+      aLight.setAttribute('fill', c.l);
+      aGlow.setAttribute('fill', c.g);
+    }
   }
 
   // Piscar aleatório
