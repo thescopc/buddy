@@ -4,6 +4,7 @@ const fs = require('fs');
 const https = require('https');
 const { spawn } = require('child_process');
 const MCPClient = require('./mcp-client');
+const { initAgent } = require('./agent');
 
 // ============================================================
 // CONFIGURAÇÃO
@@ -272,6 +273,7 @@ ipcMain.on('scheduler-task-done', () => {
 let mainWindow;
 let voiceProcess = null;
 let mcpClient = null;
+let buddyAgent = null;
 let isDragging = false;
 let dragOffset = { x: 0, y: 0 };
 
@@ -409,6 +411,74 @@ ipcMain.on('voice-control', (event, cmd) => {
 });
 
 // ============================================================
+// AGENT SYSTEM (Buddy 2.0)
+// ============================================================
+
+/**
+ * Adapta callOpenAI para o formato que o Agent espera:
+ * Recebe (messages, model) e retorna string (conteúdo da resposta).
+ */
+function callLLMForAgent(messages, model) {
+  const bodyObj = { model: model || OPENAI_MODEL, max_tokens: 1000, messages };
+  return new Promise((resolve, reject) => {
+    callOpenAI(bodyObj)
+      .then(msg => resolve(msg.content || ''))
+      .catch(reject);
+  });
+}
+
+/**
+ * Inicializa o sistema de agente após o MCP estar pronto.
+ */
+async function initBuddyAgent() {
+  try {
+    buddyAgent = await initAgent({
+      callLLM: callLLMForAgent,
+      mcpClient: mcpClient,
+      skillsDir: SKILLS_DIR,
+      onEvent: (type, data) => {
+        // Propaga eventos do agent para o renderer via IPC
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send(type, data);
+        }
+      }
+    });
+    console.log('[AGENT] Sistema Buddy 2.0 inicializado!');
+  } catch (e) {
+    console.error('[AGENT] Falha ao inicializar:', e.message);
+    buddyAgent = null;
+  }
+}
+
+// IPC: Submeter task pro Agent
+ipcMain.handle('agent-run-task', async (event, goal, context) => {
+  if (!buddyAgent) return { error: 'Agent não inicializado' };
+  try {
+    const result = await buddyAgent.runTask(goal, context || {});
+    return { result };
+  } catch (e) {
+    return { error: e.message };
+  }
+});
+
+// IPC: Cancelar task do Agent
+ipcMain.on('agent-cancel-task', (event, taskId) => {
+  if (buddyAgent && buddyAgent.taskQueue) {
+    buddyAgent.taskQueue.cancel(taskId);
+  }
+});
+
+// IPC: Status do Agent
+ipcMain.handle('agent-status', async () => {
+  if (!buddyAgent) return { ready: false };
+  return {
+    ready: true,
+    tools: buddyAgent.toolRegistry.getStats(),
+    queue: buddyAgent.taskQueue.getStats()
+  };
+});
+
+// ============================================================
 // APP LIFECYCLE
 // ============================================================
 app.whenReady().then(async () => {
@@ -416,6 +486,7 @@ app.whenReady().then(async () => {
   createWindow();
   startVoiceListener();
   await startMCP();
+  await initBuddyAgent();
   startTaskScheduler();
   globalShortcut.register('CommandOrControl+Shift+B', () => {
     if (mainWindow.isVisible()) mainWindow.hide();
@@ -426,6 +497,7 @@ app.whenReady().then(async () => {
 app.on('window-all-closed', () => {
   globalShortcut.unregisterAll();
   if (schedulerInterval) clearInterval(schedulerInterval);
+  if (buddyAgent) buddyAgent.destroy();
   if (voiceProcess) voiceProcess.kill();
   if (mcpClient) mcpClient.stop();
   app.quit();

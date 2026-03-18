@@ -15,6 +15,11 @@ contextBridge.exposeInMainWorld('buddyAPI', {
   onAgentCancelled: (callback) => ipcRenderer.on('agent-cancelled', (event, data) => callback(data)),
   agentConfirmResponse: (allowed) => ipcRenderer.send('agent-confirm-reply', allowed),
   agentCancel: () => ipcRenderer.send('agent-cancel'),
+  // Agent 2.0 — Sistema de Agente Inteligente
+  agentRunTask: (goal, context) => ipcRenderer.invoke('agent-run-task', goal, context),
+  agentCancelTask: (taskId) => ipcRenderer.send('agent-cancel-task', taskId),
+  agentStatus: () => ipcRenderer.invoke('agent-status'),
+  onAgentEvent: (eventName, callback) => ipcRenderer.on(eventName, (event, data) => callback(data)),
   // Scheduler events
   onScheduledTask: (callback) => ipcRenderer.on('scheduled-task', (event, data) => callback(data)),
   onTriggerAgentMessage: (callback) => ipcRenderer.on('trigger-agent-message', (event, data) => callback(data)),
