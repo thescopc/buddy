@@ -5,6 +5,8 @@ const https = require('https');
 const { spawn } = require('child_process');
 const MCPClient = require('./mcp-client');
 const { initAgent } = require('./agent');
+const { getMemoryManager } = require('./memory/memory-manager');
+const { MemoryExtractor } = require('./memory/memory-extractor');
 
 // ============================================================
 // CONFIGURAÇÃO
@@ -274,6 +276,8 @@ let mainWindow;
 let voiceProcess = null;
 let mcpClient = null;
 let buddyAgent = null;
+let memoryManager = null;
+let memoryExtractor = null;
 let isDragging = false;
 let dragOffset = { x: 0, y: 0 };
 
@@ -494,6 +498,19 @@ app.whenReady().then(async () => {
   startVoiceListener();
   await startMCP();
   await initBuddyAgent();
+  
+  // Inicializa Memória Estruturada 2.0
+  memoryManager = getMemoryManager(MEMORY_DIR);
+  await memoryManager.init();
+  memoryExtractor = new MemoryExtractor({
+    memoryManager,
+    apiKey: OPENAI_API_KEY,
+    turnInterval: 1
+  });
+  memoryExtractor.on('extracted', ({ facts, count }) => {
+    console.log(`[MEMORY-EXT] ${count} fato(s) extraído(s):`, JSON.stringify(facts));
+  });
+  
   startTaskScheduler();
   globalShortcut.register('CommandOrControl+Shift+B', () => {
     if (mainWindow.isVisible()) mainWindow.hide();
@@ -504,6 +521,8 @@ app.whenReady().then(async () => {
 app.on('window-all-closed', async () => {
   globalShortcut.unregisterAll();
   if (schedulerInterval) clearInterval(schedulerInterval);
+  if (memoryExtractor) memoryExtractor.destroy();
+  if (memoryManager) await memoryManager.destroy();
   if (buddyAgent) await buddyAgent.destroy();
   if (voiceProcess) voiceProcess.kill();
   if (mcpClient) mcpClient.stop();
@@ -722,7 +741,14 @@ COMO USAR SKILLS:
         
         // Se NÃO tem tool_calls → resposta final, sai do loop
         if (!response.tool_calls || response.tool_calls.length === 0) {
-          resolve(response.content || 'Pronto! ✅');
+          const finalResponse = response.content || 'Pronto! ✅';
+          // Extração de memória assíncrona (não bloqueia resposta)
+          if (memoryExtractor) {
+            memoryExtractor.processMessage(userMessage, finalResponse).catch(e => 
+              console.error('[MEMORY-EXT] Erro:', e.message)
+            );
+          }
+          resolve(finalResponse);
           return;
         }
 

@@ -235,7 +235,7 @@ Evolui a memória de markdown simples para extração automática e estruturada 
   - Merge recursivo (atualiza sem perder dados existentes)
   - **Critério de aceite:** `memoryManager.update({identity: {name: {value: "Francesco"}}})` persiste corretamente
 
-- [ ] **5.2 — Extração automática via LLM**
+- [x] **5.2 — Extração automática via LLM** ✅
   - A cada N turnos de conversa, roda extração
   - **Estágio 1 (Triagem):** LLM rápido (gpt-4o-mini) faz YES/NO — "essa mensagem contém fatos pessoais?"
   - **Estágio 2 (Extração):** Se YES, LLM extrai JSON estruturado
@@ -346,6 +346,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | **4** | **✅ ETAPA 4 COMPLETA — Catálogo de Actions Expandido (44 tools totais)** |
 
 | 2026-03-18 | 5.1 | Memória Estruturada (`memory/memory-manager.js`) — ~400 linhas, JSON { identity, preferences, relationships, notes, _meta }, CRUD thread-safe com mutex Promise, truncate 300 chars, merge recursivo, debounce save, formatMemoryForPrompt (~800 tokens), search, stats, singleton export |
+| 2026-03-18 | 5.2 | Extração automática via LLM (`memory/memory-extractor.js`) — ~280 linhas, triagem YES/NO (gpt-4o-mini), extração JSON estruturado, skip msg <10 chars/duplicada, turnInterval configurável, queue assíncrona, integrado no agentic loop (main.js + main.example.js), cleanup no shutdown |
 
 ---
 

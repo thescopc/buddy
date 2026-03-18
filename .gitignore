@@ -3,6 +3,7 @@ mcp-tools/
 .env
 memory/
 !memory/memory-manager.js
+!memory/memory-extractor.js
 skills/
 google_calendar/
 main.js
