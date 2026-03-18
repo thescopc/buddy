@@ -39,6 +39,13 @@ try {
   console.warn('[Agent] Search tools não disponíveis:', e.message);
 }
 
+let registerFileTools = null;
+try {
+  registerFileTools = require('../actions/register-file-tools').registerFileTools;
+} catch (e) {
+  console.warn('[Agent] File tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -100,6 +107,15 @@ async function initAgent(options = {}) {
       registerSearchTools({ onExpression });
     } catch (e) {
       console.warn('[Agent] Erro ao registrar search tools:', e.message);
+    }
+  }
+
+  // Carrega file controller tools
+  if (registerFileTools) {
+    try {
+      registerFileTools({ onExpression });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar file tools:', e.message);
     }
   }
 
