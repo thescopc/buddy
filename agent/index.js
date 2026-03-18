@@ -18,6 +18,13 @@ const { ErrorHandler } = require('./error-handler');
 const { Executor } = require('./executor');
 const { TaskQueue, PRIORITY } = require('./task-queue');
 
+let registerScreenTools = null;
+try {
+  registerScreenTools = require('../actions/register-screen-tools').registerScreenTools;
+} catch (e) {
+  console.warn('[Agent] Screen tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -25,11 +32,13 @@ const { TaskQueue, PRIORITY } = require('./task-queue');
  * @param {Function} options.callLLM - Função async (messages, model) => string
  * @param {Object} [options.mcpClient] - Instância do MCPClient
  * @param {string} [options.skillsDir] - Caminho da pasta de skills
+ * @param {string} [options.apiKey] - OpenAI API Key (para vision)
  * @param {Function} [options.onEvent] - Callback para eventos (type, data)
+ * @param {Function} [options.onExpression] - Callback para mudar expressão do Buddy
  * @returns {Object} { toolRegistry, planner, errorHandler, executor, taskQueue }
  */
 async function initAgent(options = {}) {
-  const { callLLM, mcpClient, skillsDir, onEvent } = options;
+  const { callLLM, mcpClient, skillsDir, apiKey, onEvent, onExpression } = options;
 
   if (!callLLM || typeof callLLM !== 'function') {
     throw new Error('[Agent] Precisa de uma função callLLM');
@@ -49,6 +58,16 @@ async function initAgent(options = {}) {
   if (skillsDir) {
     toolRegistry.loadFromSkills(skillsDir);
     toolRegistry.watchSkills(skillsDir);
+  }
+
+  // Carrega screen/vision/control tools
+  let screenModules = null;
+  if (registerScreenTools) {
+    try {
+      screenModules = registerScreenTools({ apiKey, onExpression });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar screen tools:', e.message);
+    }
   }
 
   // 2. Planner

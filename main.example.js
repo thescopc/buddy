@@ -436,10 +436,17 @@ async function initBuddyAgent() {
       callLLM: callLLMForAgent,
       mcpClient: mcpClient,
       skillsDir: SKILLS_DIR,
+      apiKey: OPENAI_API_KEY,
       onEvent: (type, data) => {
         // Propaga eventos do agent para o renderer via IPC
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send(type, data);
+        }
+      },
+      onExpression: (expression) => {
+        // Muda expressão do Buddy via IPC
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('set-expression', expression);
         }
       }
     });
