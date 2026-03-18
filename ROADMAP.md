@@ -135,7 +135,7 @@ Controle programático do navegador para tarefas web.
 
 #### Sub-etapas
 
-- [ ] **3.1 — Browser Engine** (`actions/browser-control.js`)
+- [x] **3.1 — Browser Engine** (`actions/browser-control.js`) ✅
   - Integrar Playwright (chromium)
   - Thread separada para não bloquear a UI
   - Lifecycle: launch → page → actions → close
@@ -331,6 +331,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 2.3 | Computer Control (`actions/computer-control.js`) — @nut-tree-fork/nut-js, 16 actions (click/doubleClick/rightClick/type/hotkey/scroll/moveMouse/screenFind/screenClick/clipboard), 61 teclas mapeadas |
 | 2026-03-18 | 2.4 | Integração como Tool (`actions/register-screen-tools.js`) — 10 tools registradas no Tool Registry, expressão "observing" via callback, integração completa com Agent |
 | 2026-03-18 | **2** | **✅ ETAPA 2 COMPLETA — Controle de Tela (Vision + Computer Control)** |
+| 2026-03-18 | 3.1 | Browser Engine (`actions/browser-control.js`) — Playwright + Chromium, detecção de Chrome/Edge local, lifecycle completo (launch/goTo/close), 20 métodos públicos, gerenciamento de abas, screenshot, search, auto-launch |
 
 ---
 
