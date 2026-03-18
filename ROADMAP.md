@@ -129,7 +129,7 @@ Dá "olhos" ao Buddy — ele pode ver a tela, encontrar elementos e interagir.
 ---
 
 ### Etapa 3 — Browser Automation
-> **Prioridade:** 🟡 Média | **Complexidade:** Média | **Status:** ⬜ Não iniciado
+> **Prioridade:** 🟡 Média | **Complexidade:** Média | **Status:** ✅ Concluído
 
 Controle programático do navegador para tarefas web.
 
@@ -159,7 +159,7 @@ Controle programático do navegador para tarefas web.
   - `fill_form`: Preenche formulário inteiro a partir de dict
   - **Critério de aceite:** "clica no botão de login" funciona sem seletor CSS
 
-- [ ] **3.4 — Integração como Tool**
+- [x] **3.4 — Integração como Tool** ✅
   - Registrar `browser_control` no Tool Registry
   - Planner pode criar planos que envolvem navegação web
   - **Critério de aceite:** "Buddy, busca no Google sobre X" funciona end-to-end
@@ -333,6 +333,9 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | **2** | **✅ ETAPA 2 COMPLETA — Controle de Tela (Vision + Computer Control)** |
 | 2026-03-18 | 3.1 | Browser Engine (`actions/browser-control.js`) — Playwright + Chromium, detecção de Chrome/Edge local, lifecycle completo (launch/goTo/close), 20 métodos públicos, gerenciamento de abas, screenshot, search, auto-launch |
 | 2026-03-18 | 3.2 | Actions básicas (`actions/register-browser-tools.js`) — 8 tools registradas no Tool Registry: browser_go_to, browser_search, browser_click, browser_type, browser_scroll, browser_get_text, browser_press, browser_close |
+| 2026-03-18 | 3.3 | Smart Actions IA — smartFind (7 estratégias: search-field, role, aria-label, text, placeholder, label, evaluate), smartClick (fallback force+JS), smartType, fillForm. 3 tools: browser_smart_click, browser_smart_type, browser_fill_form |
+| 2026-03-18 | 3.4 | Integração como Tool — `agent/index.js` carrega registerBrowserTools automaticamente, cleanup do browser no destroy(), async destroy no main.example.js/main.js |
+| 2026-03-18 | **3** | **✅ ETAPA 3 COMPLETA — Browser Automation** |
 
 ---
 
