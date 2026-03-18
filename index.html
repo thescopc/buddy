@@ -167,14 +167,18 @@
       width: 100%;
       height: 160px;
     }
-    #face-v2 { display: none; position: relative; overflow: hidden; background: #000; border-radius: 8px; }
+    #face-v2 { display: none; position: relative; overflow: hidden; background: #000; border-radius: 8px; width: 320px; height: 160px; }
     #face-v2-iframe {
+      position: absolute;
       width: 500px;
       height: 500px;
       border: none;
       background: transparent;
-      transform: scale(0.32);
       transform-origin: top center;
+      transform: scale(0.32);
+      top: 0;
+      left: 50%;
+      margin-left: -250px;
       pointer-events: none;
     }
     #face-v2-click-overlay {
