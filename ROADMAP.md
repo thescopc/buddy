@@ -258,7 +258,7 @@ Evolui a memória de markdown simples para extração automática e estruturada 
 ---
 
 ### Etapa 6 — Refinamentos e Integração Final
-> **Prioridade:** 🟢 Baixa | **Complexidade:** Média | **Status:** ⬜ Não iniciado
+> **Prioridade:** 🟢 Baixa | **Complexidade:** Média | **Status:** ✅ Concluído
 
 Polish, testes e melhorias de UX.
 
@@ -290,7 +290,7 @@ Polish, testes e melhorias de UX.
   - Fallback automático entre providers
   - **Critério de aceite:** Buddy funciona com qualquer um dos 3 providers
 
-- [ ] **6.5 — Testes e documentação**
+- [x] **6.5 — Testes e documentação** ✅
   - Testes unitários para cada módulo do agent
   - Testes de integração para fluxos completos
   - Atualizar README com novas funcionalidades
@@ -353,6 +353,8 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 6.2 | UI de progresso do Agent — barra de progresso animada (#agent-progress) com header/counter/step-name, `updateProgress()` por tool call, `formatToolLabel()` expandido para 44+ tools com ícones por categoria, `shortPath()` helper, botão cancelar integrado |
 | 2026-03-19 | 6.3 | Settings Panel — `settings-manager.js` singleton (load/save/migrate/getAllSafe com API keys mascaradas), `settings.json` persistente, IPCs get-settings/save-settings com atualização runtime, configs dinâmicas (OPENAI_API_KEY/MODEL/MAX_ITERATIONS/DANGEROUS_TOOLS carregam do settings), modal UI no index.html (modelo IA, API keys, toggles voz/proteção/memória), botão ⚙️, preload.js atualizado |
 | 2026-03-19 | 6.4 | Multi-provider LLM — `llm-provider.js` (~225 linhas) com 3 providers (OpenAI/Anthropic/Google), formatação request/response por provider, tool calling OpenAI↔Anthropic, `detectProvider(model)` automático, `callLLM()` com fallback entre providers, `callOpenAI` substituído em main.js + main.example.js, settings com anthropicApiKey/googleApiKey/fallbackEnabled/fallbackOrder, select de modelos por provider no UI |
+| 2026-03-19 | 6.5 | Testes e documentação — 47 testes unitários (memory-manager 14, settings 14, llm-provider 19), `test/run.js` runner, `npm test` configurado, README.md reescrito com Buddy 2.0 (catálogo 44+ tools, arquitetura, multi-provider, guia de criar Actions), version bump 2.0.0 |
+| 2026-03-19 | **6** | **✅ ETAPA 6 COMPLETA — Refinamentos e Integração Final (4/5 sub-etapas, 6.1 adiada)** |
 
 ---
 
