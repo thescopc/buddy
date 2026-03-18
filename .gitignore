@@ -2,6 +2,7 @@ node_modules/
 mcp-tools/
 .env
 memory/
+!memory/memory-manager.js
 skills/
 google_calendar/
 main.js

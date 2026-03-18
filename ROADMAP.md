@@ -228,7 +228,7 @@ Evolui a memória de markdown simples para extração automática e estruturada 
 
 #### Sub-etapas
 
-- [ ] **5.1 — Memória Estruturada** (`memory/memory-manager.js`)
+- [x] **5.1 — Memória Estruturada** (`memory/memory-manager.js`) ✅
   - Formato JSON: `{ identity, preferences, relationships, notes }`
   - CRUD thread-safe com lock
   - Truncar valores longos (máx 300 chars)
@@ -344,6 +344,8 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 4.6 | Send Message (`actions/send-message.js` + `actions/register-message-tools.js`) — WhatsApp Web (URL API + busca contato) + Telegram Bot API, 2 tools |
 | 2026-03-18 | 4.7 | Code Helper (`actions/code-helper.js` + `actions/register-code-tools.js`) — generate/run/explain/edit/autoBuild, 6 linguagens suportadas, subprocess com timeout, auto-fix loop, 5 tools |
 | 2026-03-18 | **4** | **✅ ETAPA 4 COMPLETA — Catálogo de Actions Expandido (44 tools totais)** |
+
+| 2026-03-18 | 5.1 | Memória Estruturada (`memory/memory-manager.js`) — ~400 linhas, JSON { identity, preferences, relationships, notes, _meta }, CRUD thread-safe com mutex Promise, truncate 300 chars, merge recursivo, debounce save, formatMemoryForPrompt (~800 tokens), search, stats, singleton export |
 
 ---
 
