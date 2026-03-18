@@ -142,7 +142,7 @@ Controle programático do navegador para tarefas web.
   - Detecção automática do browser padrão
   - **Critério de aceite:** `browser.goTo("google.com")` abre no browser real
 
-- [ ] **3.2 — Actions básicas**
+- [x] **3.2 — Actions básicas** ✅
   - `go_to`: Navegar para URL
   - `search`: Buscar no Google/Bing/DuckDuckGo
   - `click`: Clicar por seletor CSS ou texto
@@ -332,6 +332,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 2.4 | Integração como Tool (`actions/register-screen-tools.js`) — 10 tools registradas no Tool Registry, expressão "observing" via callback, integração completa com Agent |
 | 2026-03-18 | **2** | **✅ ETAPA 2 COMPLETA — Controle de Tela (Vision + Computer Control)** |
 | 2026-03-18 | 3.1 | Browser Engine (`actions/browser-control.js`) — Playwright + Chromium, detecção de Chrome/Edge local, lifecycle completo (launch/goTo/close), 20 métodos públicos, gerenciamento de abas, screenshot, search, auto-launch |
+| 2026-03-18 | 3.2 | Actions básicas (`actions/register-browser-tools.js`) — 8 tools registradas no Tool Registry: browser_go_to, browser_search, browser_click, browser_type, browser_scroll, browser_get_text, browser_press, browser_close |
 
 ---
 
