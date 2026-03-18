@@ -13,13 +13,18 @@ const SETTINGS_FILE = path.join(__dirname, 'settings.json');
 const DEFAULT_SETTINGS = {
   // Modelo de IA
   aiModel: 'gpt-4o-mini',
+  aiProvider: 'openai', // openai, anthropic, google
   
   // API Keys
   openaiApiKey: '',
-  googleCseKey: '',
-  googleCseId: '',
+  anthropicApiKey: '',
+  googleApiKey: '',
   weatherApiKey: '',
   telegramBotToken: '',
+  
+  // Fallback
+  fallbackEnabled: true,
+  fallbackOrder: ['openai', 'anthropic', 'google'],
   
   // Toggles
   voiceEnabled: true,
@@ -86,7 +91,7 @@ class SettingsManager {
     if (!this.loaded) this.load();
     const safe = { ...this.settings };
     // Mascara API keys para enviar ao renderer
-    for (const key of ['openaiApiKey', 'googleCseKey', 'weatherApiKey', 'telegramBotToken']) {
+    for (const key of ['openaiApiKey', 'anthropicApiKey', 'googleApiKey', 'weatherApiKey', 'telegramBotToken']) {
       if (safe[key] && safe[key].length > 8) {
         safe[key] = safe[key].substring(0, 4) + '•'.repeat(safe[key].length - 8) + safe[key].slice(-4);
       }

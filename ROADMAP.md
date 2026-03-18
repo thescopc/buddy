@@ -284,7 +284,7 @@ Polish, testes e melhorias de UX.
   - Toggle de proteção destrutiva
   - **Critério de aceite:** Todas as configs persistem e funcionam
 
-- [ ] **6.4 — Multi-provider LLM**
+- [x] **6.4 — Multi-provider LLM** ✅
   - Suporte a OpenAI, Anthropic (Claude), Google (Gemini)
   - Configurável por função (planner pode usar modelo barato, executor usa premium)
   - Fallback automático entre providers
@@ -352,6 +352,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | **5** | **✅ ETAPA 5 COMPLETA — Memória Inteligente 2.0 (4/4 sub-etapas)** |
 | 2026-03-18 | 6.2 | UI de progresso do Agent — barra de progresso animada (#agent-progress) com header/counter/step-name, `updateProgress()` por tool call, `formatToolLabel()` expandido para 44+ tools com ícones por categoria, `shortPath()` helper, botão cancelar integrado |
 | 2026-03-19 | 6.3 | Settings Panel — `settings-manager.js` singleton (load/save/migrate/getAllSafe com API keys mascaradas), `settings.json` persistente, IPCs get-settings/save-settings com atualização runtime, configs dinâmicas (OPENAI_API_KEY/MODEL/MAX_ITERATIONS/DANGEROUS_TOOLS carregam do settings), modal UI no index.html (modelo IA, API keys, toggles voz/proteção/memória), botão ⚙️, preload.js atualizado |
+| 2026-03-19 | 6.4 | Multi-provider LLM — `llm-provider.js` (~225 linhas) com 3 providers (OpenAI/Anthropic/Google), formatação request/response por provider, tool calling OpenAI↔Anthropic, `detectProvider(model)` automático, `callLLM()` com fallback entre providers, `callOpenAI` substituído em main.js + main.example.js, settings com anthropicApiKey/googleApiKey/fallbackEnabled/fallbackOrder, select de modelos por provider no UI |
 
 ---
 

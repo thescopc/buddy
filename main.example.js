@@ -9,6 +9,7 @@ const { getMemoryManager } = require('./memory/memory-manager');
 const { MemoryExtractor } = require('./memory/memory-extractor');
 const { migrate: migrateMemory } = require('./memory/migrate-memory');
 const settingsManager = require('./settings-manager');
+const { callLLM, detectProvider, PROVIDERS } = require('./llm-provider');
 
 // ============================================================
 // CONFIGURAÇÃO
@@ -898,32 +899,19 @@ function askUserConfirmation(toolName, toolArgs) {
   });
 }
 
-// Helper: chama OpenAI e retorna message
+// Helper: retorna API keys das settings para o llm-provider
+function getApiKeys() {
+  const s = settingsManager.load();
+  return {
+    openai: OPENAI_API_KEY || s.openaiApiKey,
+    anthropic: s.anthropicApiKey || '',
+    google: s.googleApiKey || ''
+  };
+}
+
+// Helper: chama LLM via multi-provider e retorna message
 function callOpenAI(bodyObj) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify(bodyObj);
-    const opts = {
-      hostname: 'api.openai.com', port: 443,
-      path: '/v1/chat/completions', method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      }
-    };
-    const req = https.request(opts, (res) => {
-      let data = '';
-      res.on('data', (c) => { data += c; });
-      res.on('end', () => {
-        try {
-          const p = JSON.parse(data);
-          if (p.choices?.[0]?.message) resolve(p.choices[0].message);
-          else if (p.error) reject(new Error(p.error.message));
-          else reject(new Error('Resposta inválida'));
-        } catch(e) { reject(e); }
-      });
-    });
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
+  const s = settingsManager.load();
+  const fallback = s.fallbackEnabled !== false ? s.fallbackOrder : null;
+  return callLLM(bodyObj, getApiKeys(), fallback);
 }

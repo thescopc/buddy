@@ -763,10 +763,23 @@
         <div class="settings-group">
           <label>Modelo de IA</label>
           <select id="set-model">
-            <option value="gpt-4o-mini">GPT-4o Mini</option>
-            <option value="gpt-4o">GPT-4o</option>
-            <option value="gpt-4.1">GPT-4.1</option>
-            <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
+            <optgroup label="OpenAI">
+              <option value="gpt-4o-mini">GPT-4o Mini</option>
+              <option value="gpt-4o">GPT-4o</option>
+              <option value="gpt-4.1">GPT-4.1</option>
+              <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
+              <option value="gpt-4.1-nano">GPT-4.1 Nano</option>
+            </optgroup>
+            <optgroup label="Anthropic">
+              <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
+              <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
+              <option value="claude-opus-4-20250514">Claude Opus 4</option>
+            </optgroup>
+            <optgroup label="Google">
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+            </optgroup>
           </select>
         </div>
         <div class="settings-group">
@@ -774,8 +787,20 @@
           <input type="password" id="set-openai-key" placeholder="sk-...">
         </div>
         <div class="settings-group">
+          <label>API Key Anthropic</label>
+          <input type="password" id="set-anthropic-key" placeholder="sk-ant-...">
+        </div>
+        <div class="settings-group">
+          <label>API Key Google</label>
+          <input type="password" id="set-google-key" placeholder="AIza...">
+        </div>
+        <div class="settings-group">
           <label>API Key Weather</label>
           <input type="password" id="set-weather-key" placeholder="OpenWeatherMap">
+        </div>
+        <div class="settings-group toggle-group">
+          <label>Fallback automático</label>
+          <input type="checkbox" id="set-fallback" checked>
         </div>
         <div class="settings-group toggle-group">
           <label>Voz (TTS)</label>
@@ -1543,7 +1568,10 @@
       const s = await window.buddyAPI.getSettings();
       document.getElementById('set-model').value = s.aiModel || 'gpt-4o-mini';
       document.getElementById('set-openai-key').value = s.openaiApiKey || '';
+      document.getElementById('set-anthropic-key').value = s.anthropicApiKey || '';
+      document.getElementById('set-google-key').value = s.googleApiKey || '';
       document.getElementById('set-weather-key').value = s.weatherApiKey || '';
+      document.getElementById('set-fallback').checked = s.fallbackEnabled !== false;
       document.getElementById('set-voice').checked = s.voiceEnabled !== false;
       document.getElementById('set-protection').checked = s.destructiveProtection !== false;
       document.getElementById('set-memory-ext').checked = s.memoryExtraction !== false;
@@ -1556,15 +1584,22 @@
   async function saveSettings() {
     const updates = {
       aiModel: document.getElementById('set-model').value,
+      fallbackEnabled: document.getElementById('set-fallback').checked,
       voiceEnabled: document.getElementById('set-voice').checked,
       destructiveProtection: document.getElementById('set-protection').checked,
       memoryExtraction: document.getElementById('set-memory-ext').checked,
     };
     // Só atualiza API keys se o campo não estiver mascarado (contém •)
-    const keyVal = document.getElementById('set-openai-key').value;
-    if (keyVal && !keyVal.includes('•')) updates.openaiApiKey = keyVal;
-    const weatherVal = document.getElementById('set-weather-key').value;
-    if (weatherVal && !weatherVal.includes('•')) updates.weatherApiKey = weatherVal;
+    const keyFields = [
+      ['set-openai-key', 'openaiApiKey'],
+      ['set-anthropic-key', 'anthropicApiKey'],
+      ['set-google-key', 'googleApiKey'],
+      ['set-weather-key', 'weatherApiKey'],
+    ];
+    for (const [id, field] of keyFields) {
+      const val = document.getElementById(id).value;
+      if (val && !val.includes('•')) updates[field] = val;
+    }
 
     try {
       const ok = await window.buddyAPI.saveSettings(updates);
