@@ -167,7 +167,7 @@ Controle programático do navegador para tarefas web.
 ---
 
 ### Etapa 4 — Catálogo de Actions Expandido
-> **Prioridade:** 🟡 Média | **Complexidade:** Média | **Status:** ⬜ Não iniciado
+> **Prioridade:** 🟡 Média | **Complexidade:** Média | **Status:** ✅ Concluído
 
 Módulos de ação especializados que ampliam as capacidades do Buddy.
 
@@ -193,25 +193,25 @@ Módulos de ação especializados que ampliam as capacidades do Buddy.
   - Detecta cidade do usuário pela memória
   - **Critério de aceite:** "Buddy, clima em Uberlândia" retorna dados corretos
 
-- [ ] **4.4 — Reminder/Scheduler** (`actions/reminder.js`)
+- [x] **4.4 — Reminder/Scheduler** (`actions/reminder.js`) ✅
   - Agenda tarefas com data/hora
   - Usa node-cron ou Windows Task Scheduler
   - Persiste em arquivo JSON
   - Notificação via TTS quando dispara
   - **Critério de aceite:** "Buddy, me lembra às 15:00 de fazer X" funciona
 
-- [ ] **4.5 — YouTube Controller** (`actions/youtube.js`)
+- [x] **4.5 — YouTube Controller** (`actions/youtube.js`) ✅
   - Buscar e abrir vídeos
   - Extrair info de vídeo (título, duração, views)
   - Trending por região
   - **Critério de aceite:** "Buddy, toca lofi no YouTube" abre o vídeo
 
-- [ ] **4.6 — Send Message** (`actions/send-message.js`)
+- [x] **4.6 — Send Message** (`actions/send-message.js`) ✅
   - Enviar mensagens via WhatsApp Web (automação browser)
   - Enviar via Telegram Bot API
   - **Critério de aceite:** "Buddy, manda mensagem pro João no WhatsApp" funciona
 
-- [ ] **4.7 — Code Helper** (`actions/code-helper.js`)
+- [x] **4.7 — Code Helper** (`actions/code-helper.js`) ✅
   - Escrever código (LLM gera, salva em arquivo)
   - Rodar código (subprocess com timeout)
   - Editar código existente
@@ -339,6 +339,11 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 4.1 | Web Search (`actions/web-search.js` + `actions/register-search-tools.js`) — DuckDuckGo lite (sem API key) + Google CSE opcional, modo comparação, 2 tools: web_search, web_compare. Integrado no agent/index.js |
 | 2026-03-18 | 4.2 | File Controller (`actions/file-controller.js` + `actions/register-file-tools.js`) — 10 ações (list/create/delete/move/copy/rename/read/write/find/disk_usage), 8 atalhos de diretório, 10 tools registradas |
 | 2026-03-18 | 4.3 | Weather (`actions/weather.js` + `actions/register-weather-tools.js`) — OpenWeatherMap API, clima atual + previsão 5 dias, formatação pt-BR, 2 tools: weather_current, weather_forecast |
+| 2026-03-18 | 4.4 | Reminder/Scheduler (`actions/reminder.js` + `actions/register-reminder-tools.js`) — add/remove/list, parsing flexível (HH:MM, ISO, "em Xmin", "amanhã"), repeat daily/weekly, persistência JSON, callback TTS, 3 tools |
+| 2026-03-18 | 4.5 | YouTube Controller (`actions/youtube.js` + `actions/register-youtube-tools.js`) — busca via scraping ytInitialData, open no browser padrão, play direto, 2 tools |
+| 2026-03-18 | 4.6 | Send Message (`actions/send-message.js` + `actions/register-message-tools.js`) — WhatsApp Web (URL API + busca contato) + Telegram Bot API, 2 tools |
+| 2026-03-18 | 4.7 | Code Helper (`actions/code-helper.js` + `actions/register-code-tools.js`) — generate/run/explain/edit/autoBuild, 6 linguagens suportadas, subprocess com timeout, auto-fix loop, 5 tools |
+| 2026-03-18 | **4** | **✅ ETAPA 4 COMPLETA — Catálogo de Actions Expandido (44 tools totais)** |
 
 ---
 
