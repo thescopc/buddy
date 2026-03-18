@@ -10,6 +10,7 @@
     "build": "npx electron-builder"
   },
   "dependencies": {
+    "@nut-tree-fork/nut-js": "^4.2.6",
     "screenshot-desktop": "^1.15.3",
     "sharp": "^0.34.5"
   },
