@@ -58,7 +58,7 @@ O coração da evolução. Transforma o Buddy de um loop simples em um agente qu
   - Fallback plan se LLM falha
   - **Critério de aceite:** `planner.createPlan("pesquisa X e salva em arquivo")` retorna JSON com steps válidos
 
-- [ ] **1.3 — Error Handler** (`agent/error-handler.js`)
+- [x] **1.3 — Error Handler** (`agent/error-handler.js`) ✅
   - Analisa erros de cada step via LLM
   - Decide: RETRY (transiente), SKIP (não-crítico), REPLAN (abordagem errada), ABORT (impossível)
   - Gera sugestão de fix para REPLAN
@@ -321,6 +321,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | — | Criação do roadmap e análise comparativa |
 | 2026-03-18 | 1.1 | Tool Registry dinâmico (`agent/tool-registry.js`) — 407 linhas, singleton EventEmitter, registro manual, loadFromMCP, loadFromSkills, hot-reload, getOpenAITools |
 | 2026-03-18 | 1.2 | Planner (`agent/planner.js`) — 324 linhas, createPlan via LLM, validação de tools, fuzzy match, fallback plan, needsPlanning heuristic |
+| 2026-03-18 | 1.3 | Error Handler (`agent/error-handler.js`) — 350 linhas, heurística rápida por padrões + LLM para ambíguos, RETRY/SKIP/REPLAN/ABORT, contadores de retry/replan, fallback |
 
 ---
 
