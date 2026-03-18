@@ -420,6 +420,52 @@
       border-color: rgba(233, 69, 96, 0.3);
     }
 
+    /* Progress bar do Agent */
+    #agent-progress {
+      background: rgba(30, 30, 40, 0.95);
+      border-top: 1px solid rgba(78, 205, 196, 0.2);
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    #progress-label {
+      color: #4ecdc4;
+      font-weight: bold;
+    }
+    #progress-counter {
+      color: var(--text-dim);
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 3px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4ecdc4, #45b7aa);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+    .progress-step-name {
+      color: var(--text-dim);
+      font-size: 9px;
+      font-family: 'Courier New', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     /* Modal de confirmação */
     #confirm-overlay {
       display: none;
@@ -645,6 +691,17 @@
   <!-- Chat -->
   <div id="chat-area">
     <div id="messages">
+    </div>
+    <!-- Barra de progresso do Agent -->
+    <div id="agent-progress" style="display:none;">
+      <div class="progress-header">
+        <span id="progress-label">Planejando...</span>
+        <span id="progress-counter"></span>
+      </div>
+      <div class="progress-bar-container">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+      <div id="progress-step-name" class="progress-step-name"></div>
     </div>
     <div id="input-area">
       <button id="tts-btn" class="active" onclick="toggleTTS()" title="Voz ligada/desligada">🔊</button>
@@ -1224,15 +1281,49 @@
   const confirmOverlay = document.getElementById('confirm-overlay');
   const confirmDetail = document.getElementById('confirm-detail');
 
-  // Mostra/esconde botão cancelar durante execução
+  // Mostra/esconde botão cancelar e progress bar durante execução
+  let agentStepCount = 0;
+  let agentMaxSteps = 25; // MAX_AGENT_ITERATIONS default
+  const progressEl = document.getElementById('agent-progress');
+  const progressBar = document.getElementById('progress-bar');
+  const progressLabel = document.getElementById('progress-label');
+  const progressCounter = document.getElementById('progress-counter');
+  const progressStepName = document.getElementById('progress-step-name');
+
   function setAgentRunning(running) {
     sendBtn.style.display = running ? 'none' : 'flex';
     cancelBtn.style.display = running ? 'flex' : 'none';
+    if (running) {
+      agentStepCount = 0;
+      progressBar.style.width = '0%';
+      progressLabel.textContent = '🧠 Planejando...';
+      progressCounter.textContent = '';
+      progressStepName.textContent = '';
+      progressEl.style.display = 'block';
+    } else {
+      progressEl.style.display = 'none';
+    }
   }
 
-  // Feedback: cada step do agente aparece no chat
+  function updateProgress(tool, args, status) {
+    if (status === 'executing') {
+      agentStepCount++;
+      const pct = Math.min((agentStepCount / agentMaxSteps) * 100, 95);
+      progressBar.style.width = pct + '%';
+      progressLabel.textContent = '⚡ Executando';
+      progressCounter.textContent = `Step ${agentStepCount}`;
+      progressStepName.textContent = formatToolLabel(tool, args);
+    } else if (status === 'done') {
+      // Mantém o step atual, apenas sinaliza concluído
+    } else if (status === 'confirming') {
+      progressLabel.textContent = '⚠️ Aguardando permissão';
+    }
+  }
+
+  // Feedback: cada step do agente aparece no chat + progress bar
   window.buddyAPI.onAgentStep((data) => {
     const toolLabel = formatToolLabel(data.tool, data.args);
+    updateProgress(data.tool, data.args, data.status);
     
     if (data.status === 'executing') {
       setExpression('working');
@@ -1272,21 +1363,95 @@
     setExpression('happy');
   });
 
-  // Formata label legível pra cada tool
+  // Formata label legível pra cada tool (44 tools do catálogo)
   function formatToolLabel(tool, args) {
+    if (!args) args = {};
+    const a = args;
     const labels = {
-      'execute_command': `Executando: ${args.command || ''}`.substring(0, 60),
-      'read_file': `Lendo: ${args.path || ''}`.substring(0, 60),
-      'write_file': `Escrevendo: ${args.path || ''}`.substring(0, 60),
-      'list_directory': `Listando: ${args.path || ''}`.substring(0, 60),
-      'search_files': `Buscando: ${args.pattern || args.path || ''}`.substring(0, 60),
-      'search_code': `Buscando código: ${args.pattern || ''}`.substring(0, 60),
-      'move_file': `Movendo: ${args.source || ''} → ${args.destination || ''}`.substring(0, 60),
-      'edit_block': `Editando: ${args.file_path || ''}`.substring(0, 60),
-      'create_directory': `Criando pasta: ${args.path || ''}`.substring(0, 60),
+      // MCP Desktop Commander
+      'execute_command': `🖥️ ${(a.command || '').substring(0, 50)}`,
+      'read_file': `📖 Lendo ${shortPath(a.path)}`,
+      'write_file': `📝 Escrevendo ${shortPath(a.path)}`,
+      'list_directory': `📂 Listando ${shortPath(a.path)}`,
+      'search_files': `🔎 Buscando: ${a.pattern || a.path || ''}`,
+      'search_code': `🔎 No código: ${a.pattern || ''}`,
+      'move_file': `📦 Movendo ${shortPath(a.source)}`,
+      'edit_block': `✏️ Editando ${shortPath(a.file_path)}`,
+      'create_directory': `📁 Criando pasta ${shortPath(a.path)}`,
+      // Screen / Vision (Etapa 2)
+      'screen_capture': '📸 Capturando tela',
+      'screen_describe': '👁️ Analisando tela',
+      'screen_find': `👁️ Procurando: ${a.description || ''}`,
+      'screen_read_text': '👁️ Lendo texto na tela',
+      'screen_click': `🖱️ Clicando: ${a.description || ''}`,
+      'mouse_click': `🖱️ Click ${a.x || ''},${a.y || ''}`,
+      'mouse_move': `🖱️ Movendo mouse`,
+      'keyboard_type': `⌨️ Digitando`,
+      'keyboard_hotkey': `⌨️ Atalho: ${a.keys || ''}`,
+      'clipboard_copy': '📋 Copiando',
     };
-    return labels[tool] || `${tool}`;
+    return (labels[tool] || formatToolLabelExtra(tool, a)).substring(0, 65);
   }
+
+  function formatToolLabelExtra(tool, a) {
+    const extra = {
+      // Browser (Etapa 3)
+      'browser_go_to': `🌐 Abrindo: ${a.url || ''}`,
+      'browser_search': `🔍 Buscando: ${a.query || ''}`,
+      'browser_click': `🌐 Clicando: ${a.selector || a.text || ''}`,
+      'browser_type': `🌐 Digitando em ${a.selector || ''}`,
+      'browser_scroll': `🌐 Scroll ${a.direction || 'down'}`,
+      'browser_get_text': '🌐 Lendo página',
+      'browser_press': `🌐 Tecla: ${a.key || ''}`,
+      'browser_close': '🌐 Fechando browser',
+      'browser_smart_click': `🌐 Click: ${a.description || ''}`,
+      'browser_smart_type': `🌐 Digitando: ${a.text || ''}`,
+      'browser_fill_form': '🌐 Preenchendo formulário',
+      // Web Search (Etapa 4)
+      'web_search': `🔍 Pesquisando: ${a.query || ''}`,
+      'web_compare': `🔍 Comparando: ${a.query || ''}`,
+      // File Controller (Etapa 4)
+      'file_list': `📂 ${a.path || a.shortcut || ''}`,
+      'file_create': `📝 Criando ${shortPath(a.path)}`,
+      'file_delete': `🗑️ Removendo ${shortPath(a.path)}`,
+      'file_move': `📦 Movendo arquivo`,
+      'file_copy': `📋 Copiando arquivo`,
+      'file_rename': `✏️ Renomeando arquivo`,
+      'file_read': `📖 Lendo ${shortPath(a.path)}`,
+      'file_write': `📝 Escrevendo ${shortPath(a.path)}`,
+      'file_find': `🔎 Buscando: ${a.name || a.extension || ''}`,
+      'file_disk_usage': '💾 Uso de disco',
+      // Weather (Etapa 4)
+      'weather_current': `🌤️ Clima: ${a.city || ''}`,
+      'weather_forecast': `🌤️ Previsão: ${a.city || ''}`,
+      // Reminder (Etapa 4)
+      'reminder_add': `⏰ Lembrete: ${a.description || ''}`,
+      'reminder_remove': '⏰ Removendo lembrete',
+      'reminder_list': '⏰ Listando lembretes',
+      // YouTube (Etapa 4)
+      'youtube_search': `▶️ YouTube: ${a.query || ''}`,
+      'youtube_play': `▶️ Tocando: ${a.query || ''}`,
+      // Messages (Etapa 4)
+      'send_whatsapp': `💬 WhatsApp: ${a.contact || ''}`,
+      'send_telegram': `💬 Telegram: ${a.chat_id || ''}`,
+      // Code Helper (Etapa 4)
+      'code_generate': `💻 Gerando código: ${a.language || ''}`,
+      'code_run': `💻 Rodando: ${a.language || a.file || ''}`,
+      'code_explain': '💻 Explicando código',
+      'code_edit': `💻 Editando código`,
+      'code_auto_build': `💻 Auto-build: ${a.description || ''}`,
+      // Agent
+      'agent_task': `🤖 Tarefa: ${(a.goal || '').substring(0, 40)}`,
+    };
+    return extra[tool] || `🔧 ${tool}`;
+  }
+
+  function shortPath(p) {
+    if (!p) return '';
+    const parts = p.replace(/\\/g, '/').split('/');
+    return parts.length > 2 ? '…/' + parts.slice(-2).join('/') : p;
+  }
+
 
   input.focus();
 

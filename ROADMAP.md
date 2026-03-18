@@ -270,7 +270,7 @@ Polish, testes e melhorias de UX.
   - "Pesquisando" (durante web search — olhos lendo rápido)
   - **Critério de aceite:** Cada nova ação aciona a expressão correta
 
-- [ ] **6.2 — UI de progresso do Agent**
+- [x] **6.2 — UI de progresso do Agent** ✅
   - Mostrar steps do plano no chat (Step 1/5: Buscando...)
   - Indicador de progresso visual
   - Botão de cancelar task em andamento
@@ -350,6 +350,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 5.3 | Injeção de contexto no prompt — `formatMemoryForPrompt()` gera bloco `[USER MEMORY]` com 4 seções (identidade/preferências/relacionamentos/notas), limite 3200 chars (~800 tokens), truncamento automático, injetado no system prompt de main.js + main.example.js |
 | 2026-03-18 | 5.4 | Migração da memória (`memory/migrate-memory.js`) — ~150 linhas, parseia user.md + personality.md (formato "chave: valor"), converte para structured-memory.json, idempotente (pula se já migrado), execução automática no startup, preserva .md originais e daily/*.md, pode rodar standalone via `node memory/migrate-memory.js` |
 | 2026-03-18 | **5** | **✅ ETAPA 5 COMPLETA — Memória Inteligente 2.0 (4/4 sub-etapas)** |
+| 2026-03-18 | 6.2 | UI de progresso do Agent — barra de progresso animada (#agent-progress) com header/counter/step-name, `updateProgress()` por tool call, `formatToolLabel()` expandido para 44+ tools com ícones por categoria, `shortPath()` helper, botão cancelar integrado |
 
 ---
 
