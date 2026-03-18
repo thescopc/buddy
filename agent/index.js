@@ -32,6 +32,13 @@ try {
   console.warn('[Agent] Browser tools não disponíveis:', e.message);
 }
 
+let registerSearchTools = null;
+try {
+  registerSearchTools = require('../actions/register-search-tools').registerSearchTools;
+} catch (e) {
+  console.warn('[Agent] Search tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -84,6 +91,15 @@ async function initAgent(options = {}) {
       browserModules = registerBrowserTools({ onExpression });
     } catch (e) {
       console.warn('[Agent] Erro ao registrar browser tools:', e.message);
+    }
+  }
+
+  // Carrega web search tools
+  if (registerSearchTools) {
+    try {
+      registerSearchTools({ onExpression });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar search tools:', e.message);
     }
   }
 
