@@ -65,7 +65,7 @@ O coração da evolução. Transforma o Buddy de um loop simples em um agente qu
   - Máximo de 2 replans por task
   - **Critério de aceite:** Dado um step falhado, retorna decisão coerente com razão e mensagem pro usuário
 
-- [ ] **1.4 — Executor** (`agent/executor.js`)
+- [x] **1.4 — Executor** (`agent/executor.js`) ✅
   - Recebe plano do Planner e executa step-by-step
   - Injeta contexto de steps anteriores nos próximos (ex: resultado da busca vira conteúdo do arquivo)
   - Chama Error Handler em caso de falha
@@ -74,7 +74,7 @@ O coração da evolução. Transforma o Buddy de um loop simples em um agente qu
   - Emite eventos para a UI (progresso, status)
   - **Critério de aceite:** Executor completa task multi-step com tratamento de erro e resumo
 
-- [ ] **1.5 — Task Queue** (`agent/task-queue.js`)
+- [x] **1.5 — Task Queue** (`agent/task-queue.js`) ✅
   - Fila com prioridade (LOW, NORMAL, HIGH)
   - Cancelamento de tasks em andamento via `cancel_flag`
   - Status tracking (PENDING, RUNNING, COMPLETED, FAILED, CANCELLED)
@@ -322,6 +322,8 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 1.1 | Tool Registry dinâmico (`agent/tool-registry.js`) — 407 linhas, singleton EventEmitter, registro manual, loadFromMCP, loadFromSkills, hot-reload, getOpenAITools |
 | 2026-03-18 | 1.2 | Planner (`agent/planner.js`) — 324 linhas, createPlan via LLM, validação de tools, fuzzy match, fallback plan, needsPlanning heuristic |
 | 2026-03-18 | 1.3 | Error Handler (`agent/error-handler.js`) — 350 linhas, heurística rápida por padrões + LLM para ambíguos, RETRY/SKIP/REPLAN/ABORT, contadores de retry/replan, fallback |
+| 2026-03-18 | 1.4 | Executor (`agent/executor.js`) — 397 linhas, execução step-by-step com injeção de contexto, depends_on, timeout 60s, re-planejamento até 2x, sumarização LLM, cancelamento, eventos para UI |
+| 2026-03-18 | 1.5 | Task Queue (`agent/task-queue.js`) — 336 linhas, fila com prioridade (LOW/NORMAL/HIGH), execução single-thread, cancelamento, status tracking, histórico, stats |
 
 ---
 
