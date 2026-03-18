@@ -37,7 +37,7 @@
 ## 🏗️ Etapas de Desenvolvimento
 
 ### Etapa 1 — Sistema de Agente Inteligente (Planner/Executor)
-> **Prioridade:** 🔴 Alta | **Complexidade:** Alta | **Status:** ⬜ Não iniciado
+> **Prioridade:** 🔴 Alta | **Complexidade:** Alta | **Status:** ✅ Concluído
 
 O coração da evolução. Transforma o Buddy de um loop simples em um agente que planeja, executa, trata erros e re-planeja.
 
@@ -82,7 +82,7 @@ O coração da evolução. Transforma o Buddy de um loop simples em um agente qu
   - Execução single-thread (uma task por vez)
   - **Critério de aceite:** Submeter 3 tasks, executam em ordem de prioridade, cancelar uma funciona
 
-- [ ] **1.6 — Integração no main.js**
+- [x] **1.6 — Integração no main.js** ✅
   - Nova tool `agent_task` no function calling do OpenAI
   - Quando LLM detecta tarefa complexa, roteia pro agent
   - Emissão de eventos IPC para atualizar expressão do Buddy (working, thinking)
@@ -324,6 +324,8 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 1.3 | Error Handler (`agent/error-handler.js`) — 350 linhas, heurística rápida por padrões + LLM para ambíguos, RETRY/SKIP/REPLAN/ABORT, contadores de retry/replan, fallback |
 | 2026-03-18 | 1.4 | Executor (`agent/executor.js`) — 397 linhas, execução step-by-step com injeção de contexto, depends_on, timeout 60s, re-planejamento até 2x, sumarização LLM, cancelamento, eventos para UI |
 | 2026-03-18 | 1.5 | Task Queue (`agent/task-queue.js`) — 336 linhas, fila com prioridade (LOW/NORMAL/HIGH), execução single-thread, cancelamento, status tracking, histórico, stats |
+| 2026-03-18 | 1.6 | Integração no main.js — `agent/index.js` (135 linhas), callLLMForAgent, initBuddyAgent, IPCs (agent-run-task, agent-cancel-task, agent-status), preload atualizado, cleanup no shutdown |
+| 2026-03-18 | **1** | **✅ ETAPA 1 COMPLETA — Sistema de Agente Inteligente (Planner/Executor)** |
 
 ---
 
