@@ -1619,6 +1619,16 @@
     resetIdleTimer();
   });
 
+  // Reminder disparou
+  window.buddyAPI.onReminderFired((data) => {
+    const msg = `⏰ Lembrete: ${data.message}`;
+    addMessage(msg, 'bot');
+    setExpression('surprised');
+    speak(data.message);
+    setTimeout(() => setExpression('happy'), 3000);
+    resetIdleTimer();
+  });
+
   window.buddyAPI.onTriggerAgentMessage(async (data) => {
     if (isProcessing) return; // Não interrompe se já está fazendo algo
 
