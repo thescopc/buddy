@@ -221,6 +221,91 @@ function registerBrowserTools(options = {}) {
   });
 
   // ============================================================
+  // 9. SMART_CLICK — Clicar por descrição (IA)
+  // ============================================================
+
+  registry.register({
+    name: 'browser_smart_click',
+    description: 'Clica em um elemento na página descrito em linguagem natural, sem precisar de seletor CSS. Usa múltiplas estratégias (role, texto, placeholder, label, title) para encontrar o elemento. Ex: "botão de login", "link Sobre nós", "Enviar".',
+    parameters: {
+      type: 'object',
+      properties: {
+        description: { type: 'string', description: 'Descrição do elemento em linguagem natural. Ex: "botão de login", "link Cadastro", "Enviar"' },
+      },
+      required: ['description'],
+    },
+    execute: async (args) => {
+      if (onExpression) onExpression('working');
+      const result = await browserControl.smartClick(args.description);
+      if (!result.success) return `Erro ao clicar: ${result.error}`;
+      return `Clicado em "${args.description}" (estratégia: ${result.strategy}, texto: "${result.text}")`;
+    },
+    source: 'browser',
+    metadata: { category: 'browser-smart' },
+  });
+
+  // ============================================================
+  // 10. SMART_TYPE — Digitar por descrição (IA)
+  // ============================================================
+
+  registry.register({
+    name: 'browser_smart_type',
+    description: 'Digita texto em um campo descrito em linguagem natural, sem precisar de seletor CSS. Encontra o campo por label, placeholder, role ou texto próximo. Ex: "campo de email", "busca", "senha".',
+    parameters: {
+      type: 'object',
+      properties: {
+        description: { type: 'string', description: 'Descrição do campo. Ex: "campo de email", "busca", "senha", "nome completo"' },
+        text: { type: 'string', description: 'Texto a digitar no campo' },
+        pressEnter: { type: 'boolean', description: 'Pressionar Enter após digitar (padrão: false)' },
+      },
+      required: ['description', 'text'],
+    },
+    execute: async (args) => {
+      if (onExpression) onExpression('working');
+      const result = await browserControl.smartType(args.description, args.text, { pressEnter: args.pressEnter });
+      if (!result.success) return `Erro ao digitar: ${result.error}`;
+      return `Digitado "${result.typed}" em "${args.description}" (estratégia: ${result.strategy})`;
+    },
+    source: 'browser',
+    metadata: { category: 'browser-smart' },
+  });
+
+  // ============================================================
+  // 11. FILL_FORM — Preencher formulário inteiro (IA)
+  // ============================================================
+
+  registry.register({
+    name: 'browser_fill_form',
+    description: 'Preenche um formulário inteiro de uma vez. Recebe um dicionário com descrições dos campos e seus valores. Pode clicar no botão de submit automaticamente. Ex: {"email": "user@test.com", "senha": "123456", "nome": "João"}.',
+    parameters: {
+      type: 'object',
+      properties: {
+        fields: {
+          type: 'object',
+          description: 'Dicionário campo→valor. Chave = descrição do campo, valor = texto a digitar. Ex: {"email": "user@test.com", "senha": "123"}',
+        },
+        submit: { type: 'boolean', description: 'Clicar no botão de submit após preencher (padrão: false)' },
+        submitButton: { type: 'string', description: 'Descrição do botão de submit (padrão: "enviar"). Ex: "Entrar", "Cadastrar", "Salvar"' },
+      },
+      required: ['fields'],
+    },
+    execute: async (args) => {
+      if (onExpression) onExpression('working');
+      const result = await browserControl.fillForm(args.fields, {
+        submit: args.submit,
+        submitButton: args.submitButton,
+      });
+      if (!result.success) {
+        const errMsg = result.errors ? result.errors.map(e => `${e.field}: ${e.error}`).join('; ') : result.error;
+        return `Formulário parcial — ${result.filled?.length || 0}/${result.totalFields} campos preenchidos. Erros: ${errMsg}`;
+      }
+      return `Formulário preenchido com sucesso — ${result.filled.length}/${result.totalFields} campos`;
+    },
+    source: 'browser',
+    metadata: { category: 'browser-smart' },
+  });
+
+  // ============================================================
   // RESUMO
   // ============================================================
 

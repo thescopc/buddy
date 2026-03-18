@@ -665,6 +665,313 @@ class BrowserControl {
   // STATUS / INFO
   // ============================================================
 
+  // ============================================================
+  // SMART ACTIONS (IA) — Encontra elementos por descrição
+  // ============================================================
+
+  /**
+   * Encontra um elemento na página por descrição em linguagem natural.
+   * Usa múltiplas estratégias: aria-label, texto visível, placeholder, title, role.
+   * 
+   * @param {string} description - Descrição do elemento. Ex: "botão de login", "campo de email"
+   * @param {Object} [options={}]
+   * @param {number} [options.timeout=10000] - Timeout em ms
+   * @returns {Promise<{success: boolean, selector?: string, text?: string, error?: string}>}
+   */
+  async smartFind(description, options = {}) {
+    try {
+      this._ensureRunning();
+      const page = this._getActivePage();
+      const timeout = options.timeout || 10000;
+      const desc = description.toLowerCase().trim();
+
+      // Estratégia 1: getByRole com name (botão, link, etc.)
+      const roleMap = [
+        { keywords: ['botão', 'botao', 'button', 'btn'], role: 'button' },
+        { keywords: ['link', 'ancora'], role: 'link' },
+        { keywords: ['campo', 'input', 'field', 'caixa de texto'], role: 'textbox' },
+        { keywords: ['checkbox', 'caixa de seleção', 'marcar'], role: 'checkbox' },
+        { keywords: ['menu', 'dropdown', 'select', 'seleção'], role: 'combobox' },
+        { keywords: ['heading', 'título', 'titulo', 'cabeçalho'], role: 'heading' },
+      ];
+
+      // Extrai possível label do elemento
+      const nameHint = desc
+        .replace(/bot[ãa]o\s*(de\s*)?/i, '')
+        .replace(/campo\s*(de\s*)?/i, '')
+        .replace(/link\s*(de\s*|para\s*)?/i, '')
+        .replace(/input\s*(de\s*)?/i, '')
+        .replace(/caixa\s*(de\s*)?/i, '')
+        .trim();
+
+      // Palavras-chave de busca para detectar campos search
+      const searchKeywords = ['busca', 'pesquisa', 'search', 'pesquisar', 'buscar', 'procurar'];
+      const buttonKeywords = ['botão', 'botao', 'button', 'btn', 'clicar', 'clique', 'submeter', 'enviar'];
+      const isSearchField = searchKeywords.some(k => desc.includes(k)) && !buttonKeywords.some(k => desc.includes(k));
+      // Só aplica search-field se NÃO mencionar "botão" e se parecer ser um campo (não "Pesquisa Google" botão)
+      const looksLikeField = desc.includes('campo') || desc.includes('input') || desc.includes('caixa')
+        || (!desc.includes('google') && !desc.includes('bing') && !desc.includes('enviar'));
+
+      // Estratégia 0: Se é campo de busca, tenta input[type=search], textarea[name*=q], etc.
+      if (isSearchField && looksLikeField) {
+        const searchSelectors = [
+          'input[type="search"]',
+          'textarea[name="q"]', 'input[name="q"]',
+          'textarea[aria-label*="earch" i]', 'input[aria-label*="earch" i]',
+          'textarea[aria-label*="usca" i]', 'input[aria-label*="usca" i]',
+          'textarea[aria-label*="esquis" i]', 'input[aria-label*="esquis" i]',
+          'textarea[title*="earch" i]', 'input[title*="earch" i]',
+          'textarea[title*="usca" i]', 'input[title*="usca" i]',
+          '[role="combobox"]', '[role="searchbox"]',
+        ];
+        for (const sel of searchSelectors) {
+          try {
+            const locator = page.locator(sel).first();
+            if (await locator.count() > 0 && await locator.isVisible()) {
+              return { success: true, locator, text: '', strategy: 'search-field' };
+            }
+          } catch (_) { /* continue */ }
+        }
+      }
+
+      for (const { keywords, role } of roleMap) {
+        if (keywords.some(k => desc.includes(k))) {
+          try {
+            const locator = nameHint
+              ? page.getByRole(role, { name: new RegExp(nameHint, 'i') })
+              : page.getByRole(role);
+            const count = await locator.count();
+            if (count > 0) {
+              const el = locator.first();
+              const text = await el.textContent().catch(() => '');
+              return { success: true, locator: el, role, text: (text || '').trim(), strategy: 'role' };
+            }
+          } catch (_) { /* continue */ }
+        }
+      }
+
+      // Estratégia 1.5: getByRole com aria-label genérica
+      try {
+        const locator = page.locator(`[aria-label*="${nameHint || desc}" i]`).first();
+        if (await locator.count() > 0 && await locator.isVisible()) {
+          const text = await locator.textContent().catch(() => '');
+          return { success: true, locator, text: (text || '').trim(), strategy: 'aria-label' };
+        }
+      } catch (_) { /* continue */ }
+
+      // Estratégia 2: getByText (texto visível)
+      try {
+        const locator = page.getByText(new RegExp(this._escapeRegex(nameHint || desc), 'i')).first();
+        if (await locator.count() > 0) {
+          const text = await locator.textContent().catch(() => '');
+          return { success: true, locator, text: (text || '').trim(), strategy: 'text' };
+        }
+      } catch (_) { /* continue */ }
+
+      // Estratégia 3: getByPlaceholder
+      try {
+        const locator = page.getByPlaceholder(new RegExp(this._escapeRegex(nameHint || desc), 'i')).first();
+        if (await locator.count() > 0) {
+          return { success: true, locator, text: '', strategy: 'placeholder' };
+        }
+      } catch (_) { /* continue */ }
+
+      // Estratégia 4: getByLabel
+      try {
+        const locator = page.getByLabel(new RegExp(this._escapeRegex(nameHint || desc), 'i')).first();
+        if (await locator.count() > 0) {
+          return { success: true, locator, text: '', strategy: 'label' };
+        }
+      } catch (_) { /* continue */ }
+
+      // Estratégia 5: getByTitle
+      try {
+        const locator = page.getByTitle(new RegExp(this._escapeRegex(nameHint || desc), 'i')).first();
+        if (await locator.count() > 0) {
+          const text = await locator.textContent().catch(() => '');
+          return { success: true, locator, text: (text || '').trim(), strategy: 'title' };
+        }
+      } catch (_) { /* continue */ }
+
+      // Estratégia 6: CSS selector genérico via evaluate
+      try {
+        const found = await page.evaluate((searchText) => {
+          const allElements = document.querySelectorAll('button, a, input, select, textarea, [role], [onclick]');
+          for (const el of allElements) {
+            const content = (el.textContent || '') + (el.getAttribute('aria-label') || '') +
+              (el.getAttribute('placeholder') || '') + (el.getAttribute('title') || '') +
+              (el.getAttribute('value') || '') + (el.getAttribute('alt') || '');
+            if (content.toLowerCase().includes(searchText.toLowerCase())) {
+              // Gera um seletor único
+              el.setAttribute('data-buddy-found', 'true');
+              return { found: true, tag: el.tagName, text: (el.textContent || '').substring(0, 100) };
+            }
+          }
+          return { found: false };
+        }, nameHint || desc);
+
+        if (found.found) {
+          const locator = page.locator('[data-buddy-found="true"]').first();
+          // Limpa o marcador
+          await page.evaluate(() => {
+            document.querySelectorAll('[data-buddy-found]').forEach(el => el.removeAttribute('data-buddy-found'));
+          });
+          return { success: true, locator, text: found.text || '', strategy: 'evaluate' };
+        }
+      } catch (_) { /* continue */ }
+
+      return { success: false, error: `Elemento "${description}" não encontrado na página` };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * Clica em um elemento descrito em linguagem natural (sem CSS selector).
+   * 
+   * @param {string} description - Ex: "botão de login", "link Sobre", "Enviar"
+   * @returns {Promise<{success: boolean, strategy?: string, text?: string, error?: string}>}
+   */
+  async smartClick(description) {
+    try {
+      this._ensureRunning();
+      const findResult = await this.smartFind(description);
+      if (!findResult.success) return findResult;
+
+      try {
+        await findResult.locator.click({ timeout: 10000 });
+      } catch (clickErr) {
+        // Fallback: se o elemento existe mas não é clicável (ex: botão oculto do Google),
+        // tenta forçar click via JS ou pressionar Enter
+        try {
+          await findResult.locator.click({ force: true, timeout: 5000 });
+        } catch (_) {
+          // Último fallback: dispara click via JS
+          await findResult.locator.evaluate(el => el.click());
+        }
+      }
+      await this._getActivePage().waitForTimeout(500);
+
+      console.log(`[BrowserControl] smartClick "${description}" via ${findResult.strategy}`);
+      return {
+        success: true,
+        description,
+        strategy: findResult.strategy,
+        text: findResult.text,
+      };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * Digita em um campo descrito em linguagem natural (sem CSS selector).
+   * 
+   * @param {string} description - Ex: "campo de email", "busca", "senha"
+   * @param {string} text - Texto a digitar
+   * @param {Object} [options={}]
+   * @param {boolean} [options.clear=true] - Limpa antes de digitar
+   * @param {boolean} [options.pressEnter=false] - Pressiona Enter após digitar
+   * @returns {Promise<{success: boolean, strategy?: string, error?: string}>}
+   */
+  async smartType(description, text, options = {}) {
+    try {
+      this._ensureRunning();
+      const findResult = await this.smartFind(description);
+      if (!findResult.success) return findResult;
+
+      if (options.clear !== false) {
+        await findResult.locator.click({ clickCount: 3 });
+        await this._getActivePage().keyboard.press('Backspace');
+      }
+
+      await findResult.locator.fill(text);
+
+      if (options.pressEnter) {
+        await this._getActivePage().keyboard.press('Enter');
+        await this._getActivePage().waitForTimeout(1000);
+      }
+
+      console.log(`[BrowserControl] smartType "${description}" via ${findResult.strategy}`);
+      return {
+        success: true,
+        description,
+        strategy: findResult.strategy,
+        typed: text.substring(0, 50),
+      };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * Preenche um formulário inteiro a partir de um dicionário campo→valor.
+   * Cada chave é uma descrição do campo, cada valor é o texto a digitar.
+   * 
+   * @param {Object} fields - Ex: { "email": "user@test.com", "senha": "123", "nome": "João" }
+   * @param {Object} [options={}]
+   * @param {boolean} [options.submit=false] - Clica no botão de submit após preencher
+   * @param {string} [options.submitButton='enviar'] - Descrição do botão de submit
+   * @returns {Promise<{success: boolean, filled?: Array, errors?: Array, error?: string}>}
+   */
+  async fillForm(fields, options = {}) {
+    try {
+      this._ensureRunning();
+      const filled = [];
+      const errors = [];
+
+      for (const [fieldDesc, value] of Object.entries(fields)) {
+        const result = await this.smartType(fieldDesc, value, { clear: true });
+        if (result.success) {
+          filled.push({ field: fieldDesc, strategy: result.strategy });
+        } else {
+          errors.push({ field: fieldDesc, error: result.error });
+        }
+      }
+
+      // Submit se solicitado
+      if (options.submit && filled.length > 0) {
+        const submitDesc = options.submitButton || 'enviar';
+        const submitResult = await this.smartClick(submitDesc);
+        if (!submitResult.success) {
+          // Tenta alternativas comuns de submit
+          const alternatives = ['submit', 'entrar', 'login', 'cadastrar', 'salvar', 'confirmar'];
+          let submitted = false;
+          for (const alt of alternatives) {
+            const altResult = await this.smartClick(alt);
+            if (altResult.success) { submitted = true; break; }
+          }
+          if (!submitted) {
+            errors.push({ field: '_submit', error: `Botão de submit não encontrado: "${submitDesc}"` });
+          }
+        }
+      }
+
+      console.log(`[BrowserControl] fillForm: ${filled.length} preenchidos, ${errors.length} erros`);
+      return {
+        success: errors.length === 0,
+        filled,
+        errors: errors.length > 0 ? errors : undefined,
+        totalFields: Object.keys(fields).length,
+      };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * Escapa caracteres especiais de regex.
+   * @param {string} str
+   * @returns {string}
+   */
+  _escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // ============================================================
+  // STATUS / INFO
+  // ============================================================
+
   /**
    * Retorna informações sobre o estado atual do browser.
    * @returns {Object}
