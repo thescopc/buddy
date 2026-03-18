@@ -7,6 +7,7 @@ const MCPClient = require('./mcp-client');
 const { initAgent } = require('./agent');
 const { getMemoryManager } = require('./memory/memory-manager');
 const { MemoryExtractor } = require('./memory/memory-extractor');
+const { migrate: migrateMemory } = require('./memory/migrate-memory');
 
 // ============================================================
 // CONFIGURAÇÃO
@@ -500,6 +501,7 @@ app.whenReady().then(async () => {
   await initBuddyAgent();
   
   // Inicializa Memória Estruturada 2.0
+  try { await migrateMemory(MEMORY_DIR); } catch(e) { console.error('[MIGRATE] Erro:', e.message); }
   memoryManager = getMemoryManager(MEMORY_DIR);
   await memoryManager.init();
   memoryExtractor = new MemoryExtractor({
