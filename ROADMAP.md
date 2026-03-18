@@ -153,7 +153,7 @@ Controle programático do navegador para tarefas web.
   - `close`: Fechar browser
   - **Critério de aceite:** Todas as 8 actions funcionam isoladamente
 
-- [ ] **3.3 — Smart Actions (IA)**
+- [x] **3.3 — Smart Actions (IA)** ✅
   - `smart_click`: Descreve o elemento em linguagem natural → Playwright encontra
   - `smart_type`: Descreve o campo → encontra → digita
   - `fill_form`: Preenche formulário inteiro a partir de dict

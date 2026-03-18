@@ -501,10 +501,10 @@ app.whenReady().then(async () => {
   });
 });
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
   globalShortcut.unregisterAll();
   if (schedulerInterval) clearInterval(schedulerInterval);
-  if (buddyAgent) buddyAgent.destroy();
+  if (buddyAgent) await buddyAgent.destroy();
   if (voiceProcess) voiceProcess.kill();
   if (mcpClient) mcpClient.stop();
   app.quit();

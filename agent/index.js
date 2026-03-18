@@ -25,6 +25,13 @@ try {
   console.warn('[Agent] Screen tools não disponíveis:', e.message);
 }
 
+let registerBrowserTools = null;
+try {
+  registerBrowserTools = require('../actions/register-browser-tools').registerBrowserTools;
+} catch (e) {
+  console.warn('[Agent] Browser tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -67,6 +74,16 @@ async function initAgent(options = {}) {
       screenModules = registerScreenTools({ apiKey, onExpression });
     } catch (e) {
       console.warn('[Agent] Erro ao registrar screen tools:', e.message);
+    }
+  }
+
+  // Carrega browser automation tools
+  let browserModules = null;
+  if (registerBrowserTools) {
+    try {
+      browserModules = registerBrowserTools({ onExpression });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar browser tools:', e.message);
     }
   }
 
@@ -137,9 +154,13 @@ async function initAgent(options = {}) {
     /**
      * Limpa tudo ao fechar o app.
      */
-    destroy() {
+    async destroy() {
       taskQueue.destroy();
       toolRegistry.destroy();
+      // Fecha browser se estiver aberto
+      if (browserModules && browserModules.browserControl) {
+        await browserModules.browserControl.close().catch(() => {});
+      }
       console.log('[Agent] Sistema destruído');
     }
   };
