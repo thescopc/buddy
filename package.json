@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nut-tree-fork/nut-js": "^4.2.6",
+    "playwright": "^1.58.2",
     "screenshot-desktop": "^1.15.3",
     "sharp": "^0.34.5"
   },
