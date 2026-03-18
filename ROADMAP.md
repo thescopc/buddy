@@ -43,7 +43,7 @@ O coração da evolução. Transforma o Buddy de um loop simples em um agente qu
 
 #### Sub-etapas
 
-- [ ] **1.1 — Tool Registry dinâmico** (`agent/tool-registry.js`)
+- [x] **1.1 — Tool Registry dinâmico** (`agent/tool-registry.js`) ✅
   - Sistema onde cada action se auto-registra com nome, descrição e parâmetros
   - As tools do MCP Desktop Commander são carregadas automaticamente
   - Skills `.md` podem registrar novas tools
@@ -319,6 +319,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | Data | Etapa | O que foi feito |
 |------|-------|-----------------|
 | 2026-03-18 | — | Criação do roadmap e análise comparativa |
+| 2026-03-18 | 1.1 | Tool Registry dinâmico (`agent/tool-registry.js`) — 407 linhas, singleton EventEmitter, registro manual, loadFromMCP, loadFromSkills, hot-reload, getOpenAITools |
 
 ---
 
