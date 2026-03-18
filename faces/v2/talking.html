@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabbie - Talking</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .scene {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+
+  /* ===== FACE ===== */
+  .face {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ===== OLHOS ===== */
+  .eyes {
+    display: flex;
+    gap: 80px;
+    position: relative;
+  }
+
+  .eye {
+    width: 72px;
+    height: 100px;
+    background: #fff;
+    border-radius: 38px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+
+  .eye::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background: #000;
+    z-index: 2;
+    animation: eyelid-top 4.5s ease-in-out infinite;
+  }
+
+  .eye::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background: #000;
+    z-index: 2;
+    animation: eyelid-bottom 4.5s ease-in-out infinite;
+  }
+
+  @keyframes eyelid-top {
+    0%, 18%, 22%, 100% { height: 0%; }
+    19.5%, 20.5% { height: 52%; }
+  }
+
+  @keyframes eyelid-bottom {
+    0%, 18%, 22%, 100% { height: 0%; }
+    19.5%, 20.5% { height: 52%; }
+  }
+
+  /* ===== BOCA ===== */
+  .mouth {
+    width: 45px;
+    margin: 22px auto 0;
+    position: relative;
+    height: 25px;
+  }
+
+  .mouth svg {
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  /* ===== ANTENA AZUL ===== */
+  .antenna {
+    position: absolute;
+    top: -65px;
+    left: 45%;
+    transform: translateX(-50%);
+    transform-origin: bottom center;
+  }
+
+  .antenna-ball {
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle at 40% 35%, #b0ffff, #00e5ff 40%, #007acc 100%);
+    border-radius: 50%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: -3px;
+    box-shadow:
+      0 0 12px rgba(0, 229, 255, 0.8),
+      0 0 30px rgba(0, 229, 255, 0.5),
+      0 0 60px rgba(0, 229, 255, 0.3),
+      0 0 90px rgba(0, 229, 255, 0.15);
+    animation: glow-pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow:
+        0 0 12px rgba(0, 229, 255, 0.8),
+        0 0 30px rgba(0, 229, 255, 0.5),
+        0 0 60px rgba(0, 229, 255, 0.3),
+        0 0 90px rgba(0, 229, 255, 0.15);
+    }
+    50% {
+      box-shadow:
+        0 0 18px rgba(0, 229, 255, 1),
+        0 0 40px rgba(0, 229, 255, 0.7),
+        0 0 80px rgba(0, 229, 255, 0.4),
+        0 0 120px rgba(0, 229, 255, 0.2);
+    }
+  }
+
+  .antenna-curve {
+    position: relative;
+  }
+
+  /* ===== SPARKLES ===== */
+  .sparkles {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #00e5ff;
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 6px rgba(0, 229, 255, 0.8);
+  }
+
+  .sparkle:nth-child(1) { top: -15px; left: -20px; animation: sparkle-float 3s ease-in-out infinite 0s; }
+  .sparkle:nth-child(2) { top: -25px; left: 5px; width: 3px; height: 3px; animation: sparkle-float 3.5s ease-in-out infinite 0.8s; }
+  .sparkle:nth-child(3) { top: -10px; left: 15px; width: 2.5px; height: 2.5px; animation: sparkle-float 2.8s ease-in-out infinite 1.5s; }
+  .sparkle:nth-child(4) { top: -30px; left: -10px; width: 2px; height: 2px; animation: sparkle-float 3.2s ease-in-out infinite 2.2s; }
+
+  @keyframes sparkle-float {
+    0% { opacity: 0; transform: translateY(0) scale(0.5); }
+    15% { opacity: 0.9; }
+    50% { opacity: 0.6; transform: translateY(-12px) scale(1); }
+    85% { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-25px) scale(0.3); }
+  }
+
+  /* ===== GLOW AMBIENTE ===== */
+  .ambient-glow {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(0, 229, 255, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    animation: ambient-breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes ambient-breathe {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="ambient-glow"></div>
+  <div class="face">
+    <!-- Antena azul -->
+    <div class="antenna">
+      <div class="antenna-ball"></div>
+      <svg width="30" height="55" viewBox="0 0 30 55" class="antenna-curve" style="overflow:visible;">
+        <path d="M 15 0 Q 16 20, 12 40 Q 10 50, 15 55"
+              stroke="rgba(100,100,100,0.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="sparkles">
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+      </div>
+    </div>
+
+    <!-- Olhos -->
+    <div class="eyes">
+      <div class="eye"></div>
+      <div class="eye"></div>
+    </div>
+
+    <!-- Boca (animada por JS) -->
+    <div class="mouth">
+      <svg id="mouthSvg" width="45" height="25" viewBox="0 0 45 25">
+        <path id="mouthPath" d="M 5 2 Q 22 14, 40 2" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+  const face = document.querySelector('.face');
+  const antenna = document.querySelector('.antenna');
+  const eyes = document.querySelectorAll('.eye');
+  const mouthPath = document.getElementById('mouthPath');
+
+  // Respiração suave
+  function updateFace() {
+    const breathe = Math.sin(Date.now() * 0.0008) * 3;
+    face.style.transform = `translate(-50%, calc(-50% + ${breathe}px))`;
+    requestAnimationFrame(updateFace);
+  }
+
+  // Boca falando - alterna entre formas naturais de fala
+  let mouthOpen = 0;
+  let mouthTarget = 0;
+  let mouthWidth = 0;
+  let mouthWidthTarget = 0;
+  let syllableTimer = 0;
+
+  function updateMouth() {
+    const now = Date.now();
+
+    // Gera novas "sílabas" - abertura varia como fala real
+    if (now > syllableTimer) {
+      // Alterna entre aberto, semi-aberto, e fechado
+      const r = Math.random();
+      if (r < 0.3) {
+        // Vogal aberta (a, o)
+        mouthTarget = 10 + Math.random() * 6;
+        mouthWidthTarget = 0.9 + Math.random() * 0.2;
+      } else if (r < 0.6) {
+        // Vogal semi (e, i)
+        mouthTarget = 4 + Math.random() * 4;
+        mouthWidthTarget = 1 + Math.random() * 0.15;
+      } else if (r < 0.85) {
+        // Consoante (quase fechada)
+        mouthTarget = 1 + Math.random() * 2;
+        mouthWidthTarget = 0.85 + Math.random() * 0.1;
+      } else {
+        // Pausa breve
+        mouthTarget = 0;
+        mouthWidthTarget = 1;
+      }
+
+      // Duração da sílaba: 80-200ms (ritmo de fala)
+      syllableTimer = now + 80 + Math.random() * 120;
+    }
+
+    // Suaviza transição
+    mouthOpen += (mouthTarget - mouthOpen) * 0.25;
+    mouthWidth += (mouthWidthTarget - mouthWidth) * 0.2;
+
+    // Gera o path da boca
+    const openY = 2 + mouthOpen;
+    const curveY = 14 + mouthOpen * 0.8;
+    const x1 = 5 / mouthWidth;
+    const x2 = 40 * mouthWidth;
+    const midX = 22;
+
+    if (mouthOpen < 2) {
+      // Boca fechada/quase - só linha curva
+      mouthPath.setAttribute('d', `M ${5} 2 Q ${midX} ${8 + mouthOpen}, ${40} 2`);
+    } else {
+      // Boca aberta - forma oval
+      mouthPath.setAttribute('d',
+        `M 8 ${4} Q ${midX} ${-1 + mouthOpen * 0.2}, ${37} ${4} ` +
+        `Q ${39} ${4 + mouthOpen * 0.5}, ${35} ${4 + mouthOpen} ` +
+        `Q ${midX} ${6 + mouthOpen * 1.1}, ${10} ${4 + mouthOpen} ` +
+        `Q ${6} ${4 + mouthOpen * 0.5}, 8 ${4} Z`
+      );
+      mouthPath.setAttribute('fill', 'rgba(255,255,255,0.9)');
+    }
+
+    if (mouthOpen < 2) {
+      mouthPath.setAttribute('fill', 'none');
+    }
+
+    requestAnimationFrame(updateMouth);
+  }
+
+  // Pausas naturais na fala (para de falar por 1-2s, depois recomeça)
+  let isTalking = true;
+  function toggleTalkPause() {
+    if (isTalking) {
+      // Pausa
+      isTalking = false;
+      mouthTarget = 0;
+      setTimeout(() => {
+        isTalking = true;
+        toggleTalkPause();
+      }, 800 + Math.random() * 1500);
+    } else {
+      setTimeout(toggleTalkPause, 2000 + Math.random() * 3000);
+    }
+  }
+
+  // Override syllable quando em pausa
+  const origUpdateMouth = updateMouth;
+
+  // Antena com balanço suave
+  let antennaAngle = 0;
+  let antennaVelocity = 0;
+  let antennaTarget = 0;
+
+  function updateAntenna() {
+    if (Math.random() < 0.012) {
+      antennaTarget = (Math.random() - 0.5) * 6;
+    }
+
+    const spring = 0.005;
+    const damping = 0.96;
+
+    antennaVelocity += (antennaTarget - antennaAngle) * spring;
+    antennaVelocity *= damping;
+    antennaAngle += antennaVelocity;
+
+    antenna.style.transform = `translateX(-50%) rotate(${antennaAngle}deg)`;
+    requestAnimationFrame(updateAntenna);
+  }
+
+  // Micro movimento dos olhos enquanto fala
+  let eyeX = 0;
+  let eyeTargetX = 0;
+  const eyesContainer = document.querySelector('.eyes');
+
+  function updateEyes() {
+    if (Math.random() < 0.01) {
+      eyeTargetX = (Math.random() - 0.5) * 5;
+    }
+    eyeX += (eyeTargetX - eyeX) * 0.04;
+    eyesContainer.style.transform = `translateX(${eyeX}px)`;
+    requestAnimationFrame(updateEyes);
+  }
+
+  // Piscar
+  function randomBlink() {
+    eyes.forEach(eye => {
+      eye.style.animation = 'none';
+      eye.offsetHeight;
+      eye.style.animation = '';
+    });
+    const next = 3000 + Math.random() * 4000;
+    setTimeout(randomBlink, next);
+  }
+
+  setTimeout(() => {
+    updateFace();
+    updateMouth();
+    updateAntenna();
+    updateEyes();
+    randomBlink();
+    toggleTalkPause();
+  }, 500);
+</script>
+
+</body>
+</html>

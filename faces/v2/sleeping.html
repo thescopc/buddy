@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabbie - Sleeping</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .scene {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+
+  /* ===== FACE CONTAINER ===== */
+  .face {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: sleep-breathe 4.5s ease-in-out infinite;
+  }
+
+  @keyframes sleep-breathe {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+    50% { transform: translate(-50%, -50%) translateY(3px) scale(0.995); }
+  }
+
+  /* ===== OLHOS FECHADOS ===== */
+  .eyes {
+    display: flex;
+    gap: 80px;
+    position: relative;
+  }
+
+  .eye-closed {
+    width: 72px;
+    height: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .eye-closed svg {
+    overflow: visible;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.4)) drop-shadow(0 0 20px rgba(255,255,255,0.15));
+  }
+
+  /* ===== SORRISO ===== */
+  .mouth {
+    width: 45px;
+    height: 0;
+    margin: 10px auto 0;
+    position: relative;
+  }
+
+  .mouth svg {
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+  }
+
+  /* ===== ANTENA (desligada) ===== */
+  .antenna {
+    position: absolute;
+    top: -65px;
+    left: 45%;
+    transform: translateX(-50%);
+    transform-origin: bottom center;
+    animation: antenna-droop 5s ease-in-out infinite;
+  }
+
+  @keyframes antenna-droop {
+    0%, 100% { transform: translateX(-50%) rotate(8deg); }
+    50% { transform: translateX(-50%) rotate(10deg); }
+  }
+
+  .antenna-ball {
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle at 40% 35%, #2a3a3a, #1a2525 40%, #0a1515 100%);
+    border-radius: 50%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: -3px;
+    box-shadow:
+      0 0 4px rgba(0, 229, 255, 0.08),
+      0 0 8px rgba(0, 229, 255, 0.04);
+    animation: dim-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes dim-pulse {
+    0%, 100% {
+      box-shadow:
+        0 0 4px rgba(0, 229, 255, 0.08),
+        0 0 8px rgba(0, 229, 255, 0.04);
+    }
+    50% {
+      box-shadow:
+        0 0 6px rgba(0, 229, 255, 0.12),
+        0 0 12px rgba(0, 229, 255, 0.06);
+    }
+  }
+
+  .antenna-curve {
+    position: relative;
+  }
+
+  /* ===== ZZZ ===== */
+  .zzz {
+    position: absolute;
+    top: -40px;
+    right: -60px;
+    pointer-events: none;
+  }
+
+  .zzz-letter {
+    position: absolute;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    text-shadow: 0 0 8px rgba(255,255,255,0.3);
+  }
+
+  .zzz-letter:nth-child(1) {
+    font-size: 14px;
+    animation: zzz-float 3.5s ease-in-out infinite 0s;
+  }
+  .zzz-letter:nth-child(2) {
+    font-size: 19px;
+    animation: zzz-float 3.5s ease-in-out infinite 0.7s;
+  }
+  .zzz-letter:nth-child(3) {
+    font-size: 25px;
+    animation: zzz-float 3.5s ease-in-out infinite 1.4s;
+  }
+
+  @keyframes zzz-float {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(-5deg) scale(0.7);
+    }
+    15% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 0.5;
+      transform: translate(15px, -30px) rotate(5deg) scale(1);
+    }
+    85% {
+      opacity: 0.15;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(25px, -55px) rotate(10deg) scale(0.8);
+    }
+  }
+
+  /* ===== GLOW AMBIENTE SUAVE (teal bem fraco) ===== */
+  .ambient-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+    width: 280px;
+    height: 180px;
+    background: radial-gradient(ellipse, rgba(0, 200, 220, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    animation: ambient-breathe 4.5s ease-in-out infinite;
+  }
+
+  @keyframes ambient-breathe {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="ambient-glow"></div>
+  <div class="face">
+    <!-- Antena (desligada) -->
+    <div class="antenna">
+      <div class="antenna-ball"></div>
+      <svg width="30" height="55" viewBox="0 0 30 55" class="antenna-curve" style="overflow:visible;">
+        <path d="M 15 0 Q 16 20, 12 40 Q 10 50, 15 55"
+              stroke="rgba(60,60,60,0.5)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <!-- ZZZ -->
+      <div class="zzz">
+        <span class="zzz-letter">z</span>
+        <span class="zzz-letter">Z</span>
+        <span class="zzz-letter">Z</span>
+      </div>
+    </div>
+
+    <!-- Olhos fechados -->
+    <div class="eyes">
+      <div class="eye-closed">
+        <svg width="55" height="25" viewBox="0 0 55 25">
+          <path d="M 5 5 Q 27 28, 50 5" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="eye-closed">
+        <svg width="55" height="25" viewBox="0 0 55 25">
+          <path d="M 5 5 Q 27 28, 50 5" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Boca -->
+    <div class="mouth">
+      <svg width="45" height="12" viewBox="0 0 45 12">
+        <path d="M 5 2 Q 22 14, 40 2" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Respiração sutil com micro-variação
+  const face = document.querySelector('.face');
+  let microY = 0;
+  let targetY = 0;
+
+  function updateSleepMovement() {
+    if (Math.random() < 0.008) {
+      targetY = (Math.random() - 0.3) * 2;
+    }
+
+    microY += (targetY - microY) * 0.015;
+    face.style.marginTop = microY + 'px';
+
+    requestAnimationFrame(updateSleepMovement);
+  }
+
+  // Antena com leve balanço preguiçoso
+  const antenna = document.querySelector('.antenna');
+  let antennaAngle = 8;
+  let antennaVelocity = 0;
+  let antennaTarget = 8;
+
+  function updateAntenna() {
+    if (Math.random() < 0.005) {
+      antennaTarget = 6 + Math.random() * 6;
+    }
+
+    const spring = 0.002;
+    const damping = 0.98;
+
+    antennaVelocity += (antennaTarget - antennaAngle) * spring;
+    antennaVelocity *= damping;
+    antennaAngle += antennaVelocity;
+
+    antenna.style.transform = `translateX(-50%) rotate(${antennaAngle}deg)`;
+    requestAnimationFrame(updateAntenna);
+  }
+
+  setTimeout(() => {
+    updateSleepMovement();
+    updateAntenna();
+  }, 500);
+</script>
+
+</body>
+</html>

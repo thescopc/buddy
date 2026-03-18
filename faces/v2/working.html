@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabbie - Working</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .scene {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+
+  /* ===== FACE ===== */
+  .face {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ===== OLHOS (concentrados - levemente apertados) ===== */
+  .eyes {
+    display: flex;
+    gap: 80px;
+    position: relative;
+  }
+
+  .eye {
+    width: 72px;
+    height: 100px;
+    background: #fff;
+    border-radius: 38px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+
+  /* Pálpebra superior */
+  .eye::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background: #000;
+    z-index: 2;
+    animation: eyelid-top 4.5s ease-in-out infinite;
+  }
+
+  /* Pálpebra inferior */
+  .eye::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background: #000;
+    z-index: 2;
+    animation: eyelid-bottom 4.5s ease-in-out infinite;
+  }
+
+  @keyframes eyelid-top {
+    0%, 18%, 22%, 100% { height: 0%; }
+    19.5%, 20.5% { height: 52%; }
+  }
+
+  @keyframes eyelid-bottom {
+    0%, 18%, 22%, 100% { height: 0%; }
+    19.5%, 20.5% { height: 52%; }
+  }
+
+
+  /* ===== BOCA (linha reta tensa / concentrada) ===== */
+  .mouth {
+    width: 40px;
+    margin: 22px auto 0;
+    position: relative;
+  }
+
+  .mouth svg {
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.15));
+  }
+
+  /* ===== ANTENA AMARELA ===== */
+  .antenna {
+    position: absolute;
+    top: -65px;
+    left: 45%;
+    transform: translateX(-50%);
+    transform-origin: bottom center;
+  }
+
+  .antenna-ball {
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 40% 35%, #c0ffc0, #22cc44 40%, #0a8828 100%);
+    border-radius: 50%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: -3px;
+    box-shadow:
+      0 0 14px rgba(34, 204, 68, 0.9),
+      0 0 35px rgba(34, 204, 68, 0.5),
+      0 0 70px rgba(20, 160, 50, 0.25);
+    animation: green-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes green-glow {
+    0%, 100% {
+      box-shadow:
+        0 0 14px rgba(34, 204, 68, 0.9),
+        0 0 35px rgba(34, 204, 68, 0.5),
+        0 0 70px rgba(20, 160, 50, 0.25);
+    }
+    50% {
+      box-shadow:
+        0 0 20px rgba(50, 220, 80, 1),
+        0 0 50px rgba(34, 204, 68, 0.7),
+        0 0 90px rgba(20, 160, 50, 0.35),
+        0 0 120px rgba(10, 130, 40, 0.15);
+    }
+  }
+
+  .antenna-curve {
+    position: relative;
+  }
+
+  /* ===== PARTÍCULAS DE ATIVIDADE ===== */
+  .activity {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(50, 220, 80, 0.8);
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 4px rgba(34, 204, 68, 0.6);
+  }
+
+  .particle:nth-child(1) { animation: work-particle 2.2s ease-out infinite 0s; --px: -15px; --py: -20px; }
+  .particle:nth-child(2) { animation: work-particle 2.5s ease-out infinite 0.5s; --px: 18px; --py: -18px; }
+  .particle:nth-child(3) { animation: work-particle 2s ease-out infinite 1s; --px: -10px; --py: -28px; }
+  .particle:nth-child(4) { animation: work-particle 2.8s ease-out infinite 1.5s; --px: 12px; --py: -25px; }
+  .particle:nth-child(5) { animation: work-particle 2.3s ease-out infinite 2s; --px: -20px; --py: -15px; }
+
+  @keyframes work-particle {
+    0% { opacity: 0; transform: translate(0, 0) scale(1); }
+    15% { opacity: 0.8; }
+    100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0); }
+  }
+
+  /* ===== DADOS FLUTUANDO ===== */
+  .data-stream {
+    position: absolute;
+    top: -80px;
+    left: -40px;
+    width: 300px;
+    height: 80px;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .data-bit {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(50, 220, 80, 0.7);
+    opacity: 0;
+    text-shadow: 0 0 4px rgba(34, 204, 68, 0.5);
+    white-space: nowrap;
+  }
+
+  /* ===== GLOW AMBIENTE ===== */
+  .ambient-glow {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(34, 204, 68, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    animation: ambient-breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes ambient-breathe {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="ambient-glow"></div>
+  <div class="face">
+    <!-- Antena amarela -->
+    <div class="antenna">
+      <div class="antenna-ball"></div>
+      <svg width="30" height="55" viewBox="0 0 30 55" class="antenna-curve" style="overflow:visible;">
+        <path d="M 15 0 Q 16 20, 12 40 Q 10 50, 15 55"
+              stroke="rgba(30,120,50,0.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <!-- Partículas de atividade -->
+      <div class="activity">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+      </div>
+    </div>
+
+    <!-- Dados flutuando da cabeça -->
+    <div class="data-stream" id="dataStream"></div>
+
+    <!-- Olhos concentrados -->
+    <div class="eyes">
+      <div class="eye"></div>
+      <div class="eye"></div>
+    </div>
+
+    <!-- Boca (linha reta levemente curvada = concentração) -->
+    <div class="mouth">
+      <svg width="40" height="10" viewBox="0 0 40 10">
+        <path d="M 4 5 Q 20 8, 36 5" stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+  const face = document.querySelector('.face');
+  const antenna = document.querySelector('.antenna');
+  const eyes = document.querySelectorAll('.eye');
+  const eyesContainer = document.querySelector('.eyes');
+
+  // Respiração suave da face
+  function updateFace() {
+    const breathe = Math.sin(Date.now() * 0.0007) * 2;
+    face.style.transform = `translate(-50%, calc(-50% + ${breathe}px))`;
+    requestAnimationFrame(updateFace);
+  }
+
+  // Olhos lendo rápido - movimento de escaneamento
+  let eyeX = 0;
+  let eyeY = 0;
+  let eyeTargetX = -8;
+  let eyeTargetY = 0;
+
+  function updateEyesReading() {
+    // Simula leitura: esquerda pra direita, pula linha
+    if (Math.random() < 0.07) {
+      eyeTargetX += 3 + Math.random() * 5;
+
+      if (eyeTargetX > 8) {
+        eyeTargetX = -8;
+        eyeTargetY += 2;
+        if (eyeTargetY > 4) {
+          eyeTargetY = -3;
+        }
+      }
+    }
+
+    // Sacadas rápidas
+    if (Math.random() < 0.015) {
+      eyeTargetX += (Math.random() - 0.5) * 3;
+    }
+
+    eyeX += (eyeTargetX - eyeX) * 0.18;
+    eyeY += (eyeTargetY - eyeY) * 0.12;
+
+    eyesContainer.style.transform = `translate(${eyeX}px, ${eyeY}px)`;
+    requestAnimationFrame(updateEyesReading);
+  }
+
+  // Antena com movimento sutil e estável
+  let antennaAngle = 0;
+  let antennaVelocity = 0;
+  let antennaTarget = 0;
+
+  function updateAntenna() {
+    if (Math.random() < 0.008) {
+      antennaTarget = (Math.random() - 0.5) * 5;
+    }
+
+    const spring = 0.004;
+    const damping = 0.97;
+
+    antennaVelocity += (antennaTarget - antennaAngle) * spring;
+    antennaVelocity *= damping;
+    antennaAngle += antennaVelocity;
+
+    antenna.style.transform = `translateX(-50%) rotate(${antennaAngle}deg)`;
+    requestAnimationFrame(updateAntenna);
+  }
+
+  // Piscar natural com variação
+  function randomBlink() {
+    eyes.forEach(eye => {
+      eye.style.animation = 'none';
+      eye.offsetHeight;
+      eye.style.animation = '';
+    });
+
+    // Pisca a cada 3-6 segundos
+    const next = 3000 + Math.random() * 3000;
+    setTimeout(randomBlink, next);
+  }
+
+  // Dados flutuando da cabeça
+  const dataStream = document.getElementById('dataStream');
+  const dataSnippets = [
+    '01101', '10010', '{ }', '0x3F', '>>>',
+    '11010', '00111', '[ ]', '0xA2', '==',
+    '10101', '01110', '< >', '0xFF', '&&',
+    '11100', '00101', '( )', '0x7B', '||',
+    '101', '110', '011', '001', '>>',
+    'fn()', '++', '::',  '01', '10',
+  ];
+
+  function spawnDataBit() {
+    const bit = document.createElement('span');
+    bit.className = 'data-bit';
+    bit.textContent = dataSnippets[Math.floor(Math.random() * dataSnippets.length)];
+
+    const startX = 30 + Math.random() * 160;
+    bit.style.left = startX + 'px';
+    bit.style.bottom = '0px';
+    bit.style.fontSize = (9 + Math.random() * 5) + 'px';
+
+    dataStream.appendChild(bit);
+
+    const driftX = (Math.random() - 0.5) * 40;
+    const duration = 1800 + Math.random() * 1200;
+
+    bit.animate([
+      { opacity: 0, transform: 'translateY(0) translateX(0)', offset: 0 },
+      { opacity: 0.8, transform: `translateY(-15px) translateX(${driftX * 0.3}px)`, offset: 0.15 },
+      { opacity: 0.6, transform: `translateY(-40px) translateX(${driftX * 0.7}px)`, offset: 0.6 },
+      { opacity: 0, transform: `translateY(-70px) translateX(${driftX}px)`, offset: 1 },
+    ], { duration, easing: 'ease-out' }).onfinish = () => bit.remove();
+
+    setTimeout(spawnDataBit, 150 + Math.random() * 250);
+  }
+
+  setTimeout(() => {
+    updateFace();
+    updateEyesReading();
+    updateAntenna();
+    randomBlink();
+    spawnDataBit();
+  }, 500);
+</script>
+
+</body>
+</html>

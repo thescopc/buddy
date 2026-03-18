@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabbie - Standby</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .scene {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+
+  /* ===== FACE CONTAINER ===== */
+  .face {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-6px); }
+  }
+
+  /* ===== OLHOS ===== */
+  .eyes {
+    display: flex;
+    gap: 80px;
+    position: relative;
+  }
+
+  .eye {
+    width: 72px;
+    height: 100px;
+    background: #fff;
+    border-radius: 38px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+
+  /* Pálpebra superior */
+  .eye::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background: #000;
+    z-index: 2;
+    animation: eyelid-top 4.5s ease-in-out infinite;
+  }
+
+  /* Pálpebra inferior */
+  .eye::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background: #000;
+    z-index: 2;
+    animation: eyelid-bottom 4.5s ease-in-out infinite;
+  }
+
+  @keyframes eyelid-top {
+    0%, 18%, 22%, 100% { height: 0%; }
+    19.5%, 20.5% { height: 52%; }
+  }
+
+  @keyframes eyelid-bottom {
+    0%, 18%, 22%, 100% { height: 0%; }
+    19.5%, 20.5% { height: 52%; }
+  }
+
+
+  /* ===== SORRISO (fechado) ===== */
+  .mouth {
+    width: 45px;
+    height: 0;
+    margin: 22px auto 0;
+    position: relative;
+  }
+
+  .mouth svg {
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+  }
+
+  /* ===== ANTENA ===== */
+  .antenna {
+    position: absolute;
+    top: -65px;
+    left: 45%;
+    transform: translateX(-50%);
+    transform-origin: bottom center;
+    animation: antenna-sway 3.5s ease-in-out infinite;
+  }
+
+  @keyframes antenna-sway {
+    0%, 100% { transform: rotate(-2deg); }
+    30% { transform: rotate(4deg); }
+    70% { transform: rotate(-3deg); }
+  }
+
+  .antenna-stalk {
+    width: 3px;
+    height: 50px;
+    background: transparent;
+    position: relative;
+    margin: 0 auto;
+  }
+
+  /* Linha curva da antena usando SVG inline */
+  .antenna-curve {
+    position: relative;
+  }
+
+  .antenna-ball {
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle at 40% 35%, #b0ffff, #00e5ff 40%, #007acc 100%);
+    border-radius: 50%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: -3px;
+    box-shadow:
+      0 0 12px rgba(0, 229, 255, 0.8),
+      0 0 30px rgba(0, 229, 255, 0.5),
+      0 0 60px rgba(0, 229, 255, 0.3),
+      0 0 90px rgba(0, 229, 255, 0.15);
+    animation: glow-pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow:
+        0 0 12px rgba(0, 229, 255, 0.8),
+        0 0 30px rgba(0, 229, 255, 0.5),
+        0 0 60px rgba(0, 229, 255, 0.3),
+        0 0 90px rgba(0, 229, 255, 0.15);
+      filter: brightness(1);
+    }
+    50% {
+      box-shadow:
+        0 0 18px rgba(0, 229, 255, 1),
+        0 0 40px rgba(0, 229, 255, 0.7),
+        0 0 80px rgba(0, 229, 255, 0.4),
+        0 0 120px rgba(0, 229, 255, 0.2);
+      filter: brightness(1.2);
+    }
+  }
+
+  /* ===== PARTÍCULAS / SPARKLES ===== */
+  .sparkles {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #00e5ff;
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 6px rgba(0, 229, 255, 0.8);
+  }
+
+  .sparkle:nth-child(1) {
+    top: -15px;
+    left: -20px;
+    animation: sparkle-float 3s ease-in-out infinite 0s;
+  }
+
+  .sparkle:nth-child(2) {
+    top: -25px;
+    left: 5px;
+    width: 3px;
+    height: 3px;
+    animation: sparkle-float 3.5s ease-in-out infinite 0.8s;
+  }
+
+  .sparkle:nth-child(3) {
+    top: -10px;
+    left: 15px;
+    width: 2.5px;
+    height: 2.5px;
+    animation: sparkle-float 2.8s ease-in-out infinite 1.5s;
+  }
+
+  .sparkle:nth-child(4) {
+    top: -30px;
+    left: -10px;
+    width: 2px;
+    height: 2px;
+    animation: sparkle-float 3.2s ease-in-out infinite 2.2s;
+  }
+
+  .sparkle:nth-child(5) {
+    top: -5px;
+    left: -15px;
+    width: 3px;
+    height: 3px;
+    animation: sparkle-float 4s ease-in-out infinite 0.4s;
+  }
+
+  @keyframes sparkle-float {
+    0% { opacity: 0; transform: translateY(0) scale(0.5); }
+    15% { opacity: 0.9; }
+    50% { opacity: 0.6; transform: translateY(-12px) scale(1); }
+    85% { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-25px) scale(0.3); }
+  }
+
+  /* ===== REFLEXO AMBIENTAL NOS OLHOS ===== */
+  .eye-shine {
+    position: absolute;
+    width: 12px;
+    height: 16px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    top: 15px;
+    left: 12px;
+    z-index: 1;
+    filter: blur(2px);
+    animation: eye-shine-move 5s ease-in-out infinite;
+  }
+
+  @keyframes eye-shine-move {
+    0%, 100% { top: 15px; left: 12px; opacity: 0.3; }
+    50% { top: 18px; left: 14px; opacity: 0.5; }
+  }
+
+  /* ===== RESPIRAÇÃO SUTIL (scaling) ===== */
+  .breathing {
+    animation: breathe 5s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+    30% { transform: translate(-50%, -50%) translateY(-5px) scale(1.008); }
+    60% { transform: translate(-50%, -50%) translateY(-2px) scale(0.997); }
+  }
+
+  /* Override float with breathing that combines both */
+  .face {
+    animation: breathe 5s ease-in-out infinite;
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="face">
+    <!-- Antena -->
+    <div class="antenna">
+      <div class="antenna-ball"></div>
+      <svg width="30" height="55" viewBox="0 0 30 55" class="antenna-curve" style="overflow:visible;">
+        <path d="M 15 0 Q 16 20, 12 40 Q 10 50, 15 55"
+              stroke="rgba(100,100,100,0.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <!-- Sparkles -->
+      <div class="sparkles">
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+      </div>
+    </div>
+
+    <!-- Olhos -->
+    <div class="eyes">
+      <div class="eye eye-left">
+        <div class="eye-shine"></div>
+      </div>
+      <div class="eye eye-right">
+        <div class="eye-shine"></div>
+      </div>
+    </div>
+
+    <!-- Boca -->
+    <div class="mouth">
+      <svg width="45" height="12" viewBox="0 0 45 12">
+        <path d="M 5 2 Q 22 14, 40 2" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Piscar aleatório extra para parecer mais natural
+  const eyes = document.querySelectorAll('.eye');
+
+  function randomBlink() {
+    eyes.forEach(eye => {
+      eye.style.animation = 'none';
+      eye.offsetHeight; // reflow
+      eye.style.animation = '';
+    });
+
+    // Próximo piscar entre 3-7 segundos
+    const next = 3000 + Math.random() * 4000;
+    setTimeout(randomBlink, next);
+  }
+
+  // Micro-movimentos na face (como se estivesse "vivo")
+  const face = document.querySelector('.face');
+  let microX = 0, microY = 0;
+  let targetX = 0, targetY = 0;
+
+  function updateMicroMovement() {
+    // Gera novo target ocasionalmente
+    if (Math.random() < 0.02) {
+      targetX = (Math.random() - 0.5) * 4;
+      targetY = (Math.random() - 0.5) * 3;
+    }
+
+    // Suaviza o movimento
+    microX += (targetX - microX) * 0.03;
+    microY += (targetY - microY) * 0.03;
+
+    // Aplica como variável CSS custom
+    face.style.marginLeft = microX + 'px';
+    face.style.marginTop = microY + 'px';
+
+    requestAnimationFrame(updateMicroMovement);
+  }
+
+  // Movimento sutil da antena com "física"
+  const antenna = document.querySelector('.antenna');
+  let antennaAngle = 0;
+  let antennaVelocity = 0;
+  let antennaTarget = 0;
+
+  function updateAntenna() {
+    if (Math.random() < 0.01) {
+      antennaTarget = (Math.random() - 0.5) * 6;
+    }
+
+    const spring = 0.005;
+    const damping = 0.96;
+
+    antennaVelocity += (antennaTarget - antennaAngle) * spring;
+    antennaVelocity *= damping;
+    antennaAngle += antennaVelocity;
+
+    antenna.style.transform = `rotate(${antennaAngle}deg)`;
+    requestAnimationFrame(updateAntenna);
+  }
+
+  // Iniciar após pequeno delay
+  setTimeout(() => {
+    randomBlink();
+    updateMicroMovement();
+    updateAntenna();
+  }, 1000);
+</script>
+
+</body>
+</html>

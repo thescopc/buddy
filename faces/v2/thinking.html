@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabbie - Thinking</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .scene {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+
+  /* ===== FACE ===== */
+  .face {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: think-sway 5s ease-in-out infinite;
+  }
+
+  @keyframes think-sway {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-4px); }
+  }
+
+  /* ===== OLHOS ===== */
+  .eyes {
+    display: flex;
+    gap: 80px;
+    position: relative;
+  }
+
+  .eye {
+    width: 72px;
+    height: 100px;
+    background: #fff;
+    border-radius: 38px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+
+  /* Pálpebra superior - meio fechada (pensando) */
+  .eye::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 25%;
+    background: #000;
+    z-index: 2;
+    animation: think-eyelid 5s ease-in-out infinite;
+  }
+
+  @keyframes think-eyelid {
+    0%, 100% { height: 25%; }
+    30% { height: 28%; }
+    60% { height: 22%; }
+  }
+
+  /* Olhos olhando pra cima (pensando) */
+  .eye-pupil {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    animation: look-up 4s ease-in-out infinite;
+  }
+
+  @keyframes look-up {
+    0%, 100% { transform: translateY(-4px) translateX(3px); }
+    50% { transform: translateY(-6px) translateX(-3px); }
+  }
+
+  /* ===== BOCA (zig-zag pensando / biquinho de lado) ===== */
+  .mouth {
+    width: 50px;
+    margin: 22px auto 0;
+    margin-left: 65%;
+    position: relative;
+  }
+
+  .mouth svg {
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.2));
+    animation: mouth-think 3s ease-in-out infinite;
+  }
+
+  @keyframes mouth-think {
+    0%, 100% { transform: translateX(0); }
+    30% { transform: translateX(3px); }
+    70% { transform: translateX(-2px); }
+  }
+
+  /* ===== ANTENA LARANJA ===== */
+  .antenna {
+    position: absolute;
+    top: -65px;
+    left: 45%;
+    transform: translateX(-50%);
+    transform-origin: bottom center;
+  }
+
+  .antenna-ball {
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 40% 35%, #ffe0a0, #ff9500 40%, #cc6600 100%);
+    border-radius: 50%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: -3px;
+    box-shadow:
+      0 0 14px rgba(255, 150, 0, 0.9),
+      0 0 35px rgba(255, 150, 0, 0.5),
+      0 0 70px rgba(255, 130, 0, 0.25);
+    animation: orange-glow 1.8s ease-in-out infinite;
+  }
+
+  @keyframes orange-glow {
+    0%, 100% {
+      box-shadow:
+        0 0 14px rgba(255, 150, 0, 0.9),
+        0 0 35px rgba(255, 150, 0, 0.5),
+        0 0 70px rgba(255, 130, 0, 0.25);
+    }
+    50% {
+      box-shadow:
+        0 0 22px rgba(255, 160, 0, 1),
+        0 0 50px rgba(255, 150, 0, 0.7),
+        0 0 90px rgba(255, 130, 0, 0.35),
+        0 0 120px rgba(255, 100, 0, 0.15);
+    }
+  }
+
+  .antenna-curve {
+    position: relative;
+  }
+
+  /* ===== ENGRENAGENS / PROCESSANDO ===== */
+  .gears {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .gear-dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 160, 50, 0.7);
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 150, 0, 0.6);
+  }
+
+  /* Dots orbitando a antena */
+  .gear-dot:nth-child(1) { animation: orbit 2s linear infinite 0s; }
+  .gear-dot:nth-child(2) { animation: orbit 2s linear infinite 0.5s; }
+  .gear-dot:nth-child(3) { animation: orbit 2s linear infinite 1s; }
+  .gear-dot:nth-child(4) { animation: orbit 2s linear infinite 1.5s; }
+
+  @keyframes orbit {
+    0% { transform: rotate(0deg) translateX(18px) scale(0.6); opacity: 0.3; }
+    50% { transform: rotate(180deg) translateX(18px) scale(1); opacity: 0.9; }
+    100% { transform: rotate(360deg) translateX(18px) scale(0.6); opacity: 0.3; }
+  }
+
+  /* ===== BOLHAS DE PENSAMENTO ===== */
+  .thought-bubbles {
+    position: absolute;
+    top: -30px;
+    right: -50px;
+    pointer-events: none;
+  }
+
+  .bubble {
+    position: absolute;
+    border: 2px solid rgba(255, 160, 50, 0.4);
+    border-radius: 50%;
+    opacity: 0;
+    background: rgba(255, 150, 0, 0.05);
+  }
+
+  .bubble:nth-child(1) {
+    width: 8px; height: 8px;
+    bottom: 0; left: 0;
+    animation: bubble-pop 3s ease-in-out infinite 0s;
+  }
+  .bubble:nth-child(2) {
+    width: 13px; height: 13px;
+    bottom: 12px; left: 10px;
+    animation: bubble-pop 3s ease-in-out infinite 0.4s;
+  }
+  .bubble:nth-child(3) {
+    width: 20px; height: 20px;
+    bottom: 28px; left: 18px;
+    animation: bubble-pop 3s ease-in-out infinite 0.8s;
+  }
+
+  @keyframes bubble-pop {
+    0% { opacity: 0; transform: scale(0.5) translateY(5px); }
+    20% { opacity: 0.7; transform: scale(1) translateY(0); }
+    70% { opacity: 0.5; transform: scale(1.05) translateY(-3px); }
+    100% { opacity: 0; transform: scale(0.8) translateY(-8px); }
+  }
+
+  /* ===== GLOW AMBIENTE ===== */
+  .ambient-glow {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(255, 150, 0, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    animation: ambient-breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes ambient-breathe {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="ambient-glow"></div>
+  <div class="face">
+    <!-- Antena laranja -->
+    <div class="antenna">
+      <div class="antenna-ball"></div>
+      <svg width="30" height="55" viewBox="0 0 30 55" class="antenna-curve" style="overflow:visible;">
+        <path d="M 15 0 Q 16 20, 12 40 Q 10 50, 15 55"
+              stroke="rgba(180,120,30,0.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <!-- Dots orbitando -->
+      <div class="gears">
+        <div class="gear-dot"></div>
+        <div class="gear-dot"></div>
+        <div class="gear-dot"></div>
+        <div class="gear-dot"></div>
+      </div>
+      <!-- Bolhas de pensamento -->
+      <div class="thought-bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+      </div>
+    </div>
+
+    <!-- Olhos (olhando pra cima) -->
+    <div class="eyes">
+      <div class="eye">
+        <div class="eye-pupil"></div>
+      </div>
+      <div class="eye">
+        <div class="eye-pupil"></div>
+      </div>
+    </div>
+
+    <!-- Boca (biquinho de lado - pensando) -->
+    <div class="mouth">
+      <svg width="22" height="16" viewBox="0 0 22 16">
+        <path d="M 2 4 Q 8 2, 14 6 Q 18 9, 20 5"
+              stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+  const face = document.querySelector('.face');
+  const antenna = document.querySelector('.antenna');
+
+  // Face olhando levemente pros lados enquanto pensa
+  let lookX = 0;
+  let lookTarget = 0;
+
+  function updateThinkLook() {
+    if (Math.random() < 0.01) {
+      lookTarget = (Math.random() - 0.5) * 8;
+    }
+
+    lookX += (lookTarget - lookX) * 0.02;
+
+    const baseY = Math.sin(Date.now() * 0.0006) * 4;
+    face.style.transform = `translate(calc(-50% + ${lookX}px), calc(-50% + ${baseY}px))`;
+    requestAnimationFrame(updateThinkLook);
+  }
+
+  // Antena "processando" - gira levemente
+  let antennaAngle = 0;
+  let antennaVelocity = 0;
+  let antennaTarget = 0;
+
+  function updateAntenna() {
+    if (Math.random() < 0.02) {
+      antennaTarget = (Math.random() - 0.5) * 8;
+    }
+
+    const spring = 0.006;
+    const damping = 0.96;
+
+    antennaVelocity += (antennaTarget - antennaAngle) * spring;
+    antennaVelocity *= damping;
+    antennaAngle += antennaVelocity;
+
+    antenna.style.transform = `translateX(-50%) rotate(${antennaAngle}deg)`;
+    requestAnimationFrame(updateAntenna);
+  }
+
+  setTimeout(() => {
+    updateThinkLook();
+    updateAntenna();
+  }, 500);
+</script>
+
+</body>
+</html>
