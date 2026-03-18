@@ -612,6 +612,12 @@ ipcMain.handle('chat-with-claude', async (event, userMessage, history) => {
   const currentTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const isFirstUse = memory.user.includes('Buddy ainda não sabe o nome do usuário');
 
+  // Carrega memória estruturada 2.0
+  let structuredMemory = '';
+  if (memoryManager) {
+    try { structuredMemory = await memoryManager.formatMemoryForPrompt(); } catch(e) { /* ignora */ }
+  }
+
   // Carrega lista de skills
   const skills = listSkills();
   const skillsText = skills.length > 0
@@ -626,7 +632,7 @@ HORA ATUAL: ${currentTime} | DATA: ${todayStr}
 
 ${memory.user}
 
-MEMÓRIA DO DIA (${todayStr}):
+${structuredMemory ? structuredMemory + '\n' : ''}MEMÓRIA DO DIA (${todayStr}):
 ${memory.daily}
 
 TAREFAS PENDENTES:

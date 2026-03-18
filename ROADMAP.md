@@ -243,7 +243,7 @@ Evolui a memória de markdown simples para extração automática e estruturada 
   - Thread separada para não bloquear
   - **Critério de aceite:** Dizer "Meu nome é Francesco e moro em Uberlândia" salva automaticamente
 
-- [ ] **5.3 — Injeção de contexto no prompt**
+- [x] **5.3 — Injeção de contexto no prompt** ✅
   - `formatMemoryForPrompt()` gera bloco `[USER MEMORY]` com dados relevantes
   - Injetado no system prompt a cada sessão
   - Limite de 800 tokens para não estourar o contexto
@@ -347,6 +347,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 
 | 2026-03-18 | 5.1 | Memória Estruturada (`memory/memory-manager.js`) — ~400 linhas, JSON { identity, preferences, relationships, notes, _meta }, CRUD thread-safe com mutex Promise, truncate 300 chars, merge recursivo, debounce save, formatMemoryForPrompt (~800 tokens), search, stats, singleton export |
 | 2026-03-18 | 5.2 | Extração automática via LLM (`memory/memory-extractor.js`) — ~280 linhas, triagem YES/NO (gpt-4o-mini), extração JSON estruturado, skip msg <10 chars/duplicada, turnInterval configurável, queue assíncrona, integrado no agentic loop (main.js + main.example.js), cleanup no shutdown |
+| 2026-03-18 | 5.3 | Injeção de contexto no prompt — `formatMemoryForPrompt()` gera bloco `[USER MEMORY]` com 4 seções (identidade/preferências/relacionamentos/notas), limite 3200 chars (~800 tokens), truncamento automático, injetado no system prompt de main.js + main.example.js |
 
 ---
 
