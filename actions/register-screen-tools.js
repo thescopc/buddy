@@ -260,6 +260,65 @@ function registerScreenTools(options = {}) {
     metadata: { category: 'control' }
   });
 
+  // ============================================================
+  // WAIT TOOL
+  // ============================================================
+  registry.register({
+    name: 'computer_wait',
+    description: 'Espera um tempo em milissegundos. Útil entre ações de controle (ex: após abrir menu iniciar, esperar antes de digitar).',
+    parameters: {
+      type: 'object',
+      properties: {
+        ms: { type: 'number', description: 'Tempo em milissegundos. Ex: 1000 = 1 segundo' }
+      },
+      required: ['ms']
+    },
+    execute: async (args) => {
+      const ms = Math.min(args.ms || 1000, 10000); // max 10s
+      await computerControl.wait(ms);
+      return `Aguardou ${ms}ms`;
+    },
+    source: 'screen',
+    metadata: { category: 'control' }
+  });
+
+  // ============================================================
+  // OPEN PROGRAM (combo tool)
+  // ============================================================
+  registry.register({
+    name: 'open_program',
+    description: 'Abre um programa no Windows usando o menu Iniciar. Pressiona Win, digita o nome, e pressiona Enter. Funciona com qualquer programa instalado: Spotify, Chrome, VS Code, Calculadora, etc.',
+    parameters: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Nome do programa a abrir. Ex: "Spotify", "Google Chrome", "Visual Studio Code", "Calculadora"' }
+      },
+      required: ['name']
+    },
+    execute: async (args) => {
+      const name = args.name;
+      console.log(`[ScreenTools] Abrindo programa: ${name}`);
+      try {
+        // 1. Pressiona Win para abrir menu Iniciar
+        await computerControl.hotkey(['win']);
+        await computerControl.wait(1200);
+        
+        // 2. Digita o nome do programa
+        await computerControl.type(name);
+        await computerControl.wait(1000);
+        
+        // 3. Pressiona Enter para abrir
+        await computerControl.hotkey(['enter']);
+        
+        return `Programa "${name}" aberto via menu Iniciar (Win → digitou "${name}" → Enter)`;
+      } catch (e) {
+        return `Erro ao abrir "${name}": ${e.message}. Tente execute_command com "start ${name}"`;
+      }
+    },
+    source: 'screen',
+    metadata: { category: 'control' }
+  });
+
   const stats = registry.getBySource('screen');
   console.log(`[ScreenTools] ${stats.length} tools registradas`);
 

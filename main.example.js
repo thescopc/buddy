@@ -741,15 +741,11 @@ Você pode VER a tela do usuário e CONTROLAR mouse/teclado:
 - computer_hotkey: Pressiona atalho de teclado. Ex: computer_hotkey({keys: ["ctrl","c"]})
 - computer_scroll: Scroll na janela em foco
 - computer_clipboard: Copia/lê texto do clipboard
+- computer_wait: Espera X milissegundos (útil entre ações)
+- open_program: ABRE QUALQUER PROGRAMA pelo nome via menu Iniciar. Ex: open_program({name: "Spotify"})
 FLUXO PARA "VER A TELA": screen_describe (já captura automaticamente)
 FLUXO PARA "CLICAR EM ALGO": screen_click com a descrição do elemento
-FLUXO PARA "ABRIR PROGRAMA":
-  1) computer_hotkey({keys: ["win"]}) → abre menu Iniciar
-  2) aguarda 1 segundo
-  3) computer_type({text: "nome do programa"}) → digita o nome
-  4) aguarda 1 segundo
-  5) computer_hotkey({keys: ["enter"]}) → abre o programa
-  Ou mais simples: execute_command com "start nome_do_programa"
+FLUXO PARA "ABRIR PROGRAMA": open_program({name: "Spotify"}) — funciona com QUALQUER app!
 
 === NAVEGADOR WEB ===
 Você pode controlar um navegador real:
@@ -812,12 +808,10 @@ Você pode controlar um navegador real:
 - create_directory: Cria pastas
 
 DICA: ABRIR PROGRAMAS
-Método 1 (terminal): execute_command com "start notepad" ou "start calc" ou "start chrome"
-Método 2 (menu iniciar — como humano faria):
-  1) computer_hotkey({keys: ["win"]}) → abre menu Iniciar
-  2) computer_type({text: "Bloco de Notas"}) → digita o nome
-  3) computer_hotkey({keys: ["enter"]}) → abre
-Prefira o Método 1 quando souber o nome do executável. Use Método 2 quando não souber.
+Quando o usuário pedir pra abrir qualquer programa (Spotify, Chrome, VS Code, Calculadora, etc):
+→ USE open_program({name: "Spotify"}) — é a forma mais fácil e funciona com QUALQUER programa!
+  Ele abre o menu Iniciar do Windows, digita o nome e pressiona Enter automaticamente.
+Alternativa: execute_command com "start spotify" (só funciona se souber o nome do executável)
 
 DICA: VER A TELA DO USUÁRIO
 Quando o usuário pedir pra você "ver", "olhar" ou "descrever" a tela:
