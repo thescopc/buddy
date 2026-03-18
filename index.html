@@ -1721,7 +1721,14 @@
       const ok = await window.buddyAPI.saveSettings(updates);
       const st = document.getElementById('settings-status');
       st.textContent = ok ? '✅ Salvo!' : '❌ Erro';
-      if (ok) setTimeout(() => { st.textContent = ''; }, 2000);
+      if (ok) {
+        // Hot switch de rosto se mudou
+        if (updates.faceStyle && updates.faceStyle !== currentFaceStyle) {
+          switchFaceStyle(updates.faceStyle);
+          setExpression(currentExpression);
+        }
+        setTimeout(() => { st.textContent = ''; }, 2000);
+      }
     } catch(e) {
       document.getElementById('settings-status').textContent = '❌ Erro';
     }
