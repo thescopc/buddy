@@ -173,7 +173,7 @@ Módulos de ação especializados que ampliam as capacidades do Buddy.
 
 #### Sub-etapas
 
-- [ ] **4.1 — Web Search** (`actions/web-search.js`)
+- [x] **4.1 — Web Search** (`actions/web-search.js`) ✅
   - Busca via API (Google Custom Search ou SerpAPI)
   - Fallback com DuckDuckGo (ddgs)
   - Modo comparação: compara N itens por aspecto
@@ -336,6 +336,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 3.3 | Smart Actions IA — smartFind (7 estratégias: search-field, role, aria-label, text, placeholder, label, evaluate), smartClick (fallback force+JS), smartType, fillForm. 3 tools: browser_smart_click, browser_smart_type, browser_fill_form |
 | 2026-03-18 | 3.4 | Integração como Tool — `agent/index.js` carrega registerBrowserTools automaticamente, cleanup do browser no destroy(), async destroy no main.example.js/main.js |
 | 2026-03-18 | **3** | **✅ ETAPA 3 COMPLETA — Browser Automation** |
+| 2026-03-18 | 4.1 | Web Search (`actions/web-search.js` + `actions/register-search-tools.js`) — DuckDuckGo lite (sem API key) + Google CSE opcional, modo comparação, 2 tools: web_search, web_compare. Integrado no agent/index.js |
 
 ---
 
