@@ -92,7 +92,7 @@ O coração da evolução. Transforma o Buddy de um loop simples em um agente qu
 ---
 
 ### Etapa 2 — Controle de Tela (Vision + Computer Control)
-> **Prioridade:** 🔴 Alta | **Complexidade:** Alta | **Status:** ⬜ Não iniciado
+> **Prioridade:** 🔴 Alta | **Complexidade:** Alta | **Status:** ✅ Concluído
 
 Dá "olhos" ao Buddy — ele pode ver a tela, encontrar elementos e interagir.
 
@@ -112,7 +112,7 @@ Dá "olhos" ao Buddy — ele pode ver a tela, encontrar elementos e interagir.
   - Modo "find element": retorna coordenadas x,y de um elemento descrito
   - **Critério de aceite:** "O que tem na minha tela?" retorna descrição precisa
 
-- [ ] **2.3 — Computer Control** (`actions/computer-control.js`)
+- [x] **2.3 — Computer Control** (`actions/computer-control.js`) ✅
   - Integrar `@nut-tree/nut-js` (ou robotjs) para controle de mouse/teclado
   - Actions: click, doubleClick, rightClick, type, hotkey, scroll, moveMouse
   - `screen_find`: descreve elemento → Vision retorna coordenadas → clica
@@ -120,7 +120,7 @@ Dá "olhos" ao Buddy — ele pode ver a tela, encontrar elementos e interagir.
   - Clipboard: copiar/colar via nativeClipboard
   - **Critério de aceite:** "Buddy, clica no botão Iniciar" funciona via screen_find + click
 
-- [ ] **2.4 — Integração como Tool**
+- [x] **2.4 — Integração como Tool** ✅
   - Registrar `screen_process` e `computer_control` no Tool Registry
   - Planner pode usar essas tools em planos multi-step
   - Expressão do Buddy muda para "observando" durante vision
@@ -328,6 +328,9 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | **1** | **✅ ETAPA 1 COMPLETA — Sistema de Agente Inteligente (Planner/Executor)** |
 | 2026-03-18 | 2.1 | Screen Capture (`actions/screen-capture.js`) — screenshot-desktop + sharp, captura 640x360 JPEG ~15KB em <400ms, multi-display, processamento webcam, auto-reduce quality |
 | 2026-03-18 | 2.2 | Vision Analyzer (`actions/vision-analyzer.js`) — 298 linhas, 3 modos (describe/findElement/readText), GPT-4o vision API, escalonamento de coordenadas, integração com ScreenCapture |
+| 2026-03-18 | 2.3 | Computer Control (`actions/computer-control.js`) — @nut-tree-fork/nut-js, 16 actions (click/doubleClick/rightClick/type/hotkey/scroll/moveMouse/screenFind/screenClick/clipboard), 61 teclas mapeadas |
+| 2026-03-18 | 2.4 | Integração como Tool (`actions/register-screen-tools.js`) — 10 tools registradas no Tool Registry, expressão "observing" via callback, integração completa com Agent |
+| 2026-03-18 | **2** | **✅ ETAPA 2 COMPLETA — Controle de Tela (Vision + Computer Control)** |
 
 ---
 
