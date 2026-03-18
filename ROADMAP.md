@@ -187,7 +187,7 @@ Módulos de ação especializados que ampliam as capacidades do Buddy.
   - Top N maiores arquivos
   - **Critério de aceite:** Todas as ações funcionam com caminhos absolutos e atalhos
 
-- [ ] **4.3 — Weather** (`actions/weather.js`)
+- [x] **4.3 — Weather** (`actions/weather.js`) ✅
   - API OpenWeatherMap (free tier)
   - Retorna temperatura, condição, previsão
   - Detecta cidade do usuário pela memória
@@ -338,6 +338,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | **3** | **✅ ETAPA 3 COMPLETA — Browser Automation** |
 | 2026-03-18 | 4.1 | Web Search (`actions/web-search.js` + `actions/register-search-tools.js`) — DuckDuckGo lite (sem API key) + Google CSE opcional, modo comparação, 2 tools: web_search, web_compare. Integrado no agent/index.js |
 | 2026-03-18 | 4.2 | File Controller (`actions/file-controller.js` + `actions/register-file-tools.js`) — 10 ações (list/create/delete/move/copy/rename/read/write/find/disk_usage), 8 atalhos de diretório, 10 tools registradas |
+| 2026-03-18 | 4.3 | Weather (`actions/weather.js` + `actions/register-weather-tools.js`) — OpenWeatherMap API, clima atual + previsão 5 dias, formatação pt-BR, 2 tools: weather_current, weather_forecast |
 
 ---
 
