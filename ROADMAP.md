@@ -98,7 +98,7 @@ Dá "olhos" ao Buddy — ele pode ver a tela, encontrar elementos e interagir.
 
 #### Sub-etapas
 
-- [ ] **2.1 — Screen Capture** (`actions/screen-capture.js`)
+- [x] **2.1 — Screen Capture** (`actions/screen-capture.js`) ✅
   - Usa `desktopCapturer` do Electron para capturar a tela
   - Redimensiona para resolução econômica (640x360)
   - Retorna buffer JPEG otimizado
@@ -326,6 +326,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 1.5 | Task Queue (`agent/task-queue.js`) — 336 linhas, fila com prioridade (LOW/NORMAL/HIGH), execução single-thread, cancelamento, status tracking, histórico, stats |
 | 2026-03-18 | 1.6 | Integração no main.js — `agent/index.js` (135 linhas), callLLMForAgent, initBuddyAgent, IPCs (agent-run-task, agent-cancel-task, agent-status), preload atualizado, cleanup no shutdown |
 | 2026-03-18 | **1** | **✅ ETAPA 1 COMPLETA — Sistema de Agente Inteligente (Planner/Executor)** |
+| 2026-03-18 | 2.1 | Screen Capture (`actions/screen-capture.js`) — screenshot-desktop + sharp, captura 640x360 JPEG ~15KB em <400ms, multi-display, processamento webcam, auto-reduce quality |
 
 ---
 
