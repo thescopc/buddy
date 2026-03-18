@@ -46,6 +46,13 @@ try {
   console.warn('[Agent] File tools não disponíveis:', e.message);
 }
 
+let registerWeatherTools = null;
+try {
+  registerWeatherTools = require('../actions/register-weather-tools').registerWeatherTools;
+} catch (e) {
+  console.warn('[Agent] Weather tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -116,6 +123,15 @@ async function initAgent(options = {}) {
       registerFileTools({ onExpression });
     } catch (e) {
       console.warn('[Agent] Erro ao registrar file tools:', e.message);
+    }
+  }
+
+  // Carrega weather tools
+  if (registerWeatherTools) {
+    try {
+      registerWeatherTools({ onExpression });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar weather tools:', e.message);
     }
   }
 
