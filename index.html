@@ -893,9 +893,50 @@
   // ============================================================
   // EXPRESSÕES
   // ============================================================
+
+  // Mapeamento V1 → V2
+  const V2_EXPRESSION_MAP = {
+    'happy': 'standby',
+    'surprised': 'standby',
+    'talking': 'talking',
+    'thinking': 'thinking',
+    'sleeping': 'sleeping',
+    'working': 'working',
+    'angry': 'angry',
+    'listening': 'listening',
+    'blinking': 'standby',
+  };
+
+  // Dispatcher principal — todo o sistema chama esta função
   function setExpression(expr) {
     currentExpression = expr;
-    
+    if (currentFaceStyle === 'v2') {
+      setExpressionV2(expr);
+    } else {
+      setExpressionV1(expr);
+    }
+  }
+
+  // V2: Troca iframe src
+  function setExpressionV2(expr) {
+    const iframe = document.getElementById('face-v2-iframe');
+    if (!iframe) return;
+
+    const mapped = V2_EXPRESSION_MAP[expr] || 'standby';
+    const newSrc = 'faces/v2/' + mapped + '.html';
+
+    // Só troca se mudou (evita reload desnecessário)
+    if (!iframe.src.endsWith(newSrc)) {
+      iframe.src = newSrc;
+    }
+
+    // Atualiza status text e antena (compartilhados)
+    updateStatusText(expr);
+    updateAntennaColor(expr);
+  }
+
+  // V1: SVG inline (lógica original)
+  function setExpressionV1(expr) {
     const mouth = document.getElementById('buddy-mouth');
     const eyeLBg = document.getElementById('eye-l-bg');
     const eyeRBg = document.getElementById('eye-r-bg');
@@ -1085,6 +1126,12 @@
       mouth.setAttribute('d', 'M 52 102 Q 60 116, 70 116 Q 80 116, 88 102');
     }
 
+    updateStatusText(expr);
+    updateAntennaColor(expr);
+  }
+
+  // Funções compartilhadas V1/V2
+  function updateStatusText(expr) {
     const statusMap = {
       'happy': 'acordado ✨',
       'talking': 'falando... 🗣️',
@@ -1094,10 +1141,11 @@
       'listening': 'ouvindo... 🎤',
       'working': 'executando... ⚡',
       'angry': 'calado! 😤',
-      'blinking': currentExpression
     };
     if (statusMap[expr]) status.textContent = statusMap[expr];
+  }
 
+  function updateAntennaColor(expr) {
     // Cor da antena por expressão
     const aLight = document.getElementById('antenna-light');
     const aGlow = document.getElementById('antenna-glow');
