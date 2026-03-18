@@ -50,7 +50,7 @@ O coração da evolução. Transforma o Buddy de um loop simples em um agente qu
   - Hot-reload sem reiniciar o app
   - **Critério de aceite:** `toolRegistry.getAll()` retorna lista completa de tools com schemas
 
-- [ ] **1.2 — Planner** (`agent/planner.js`)
+- [x] **1.2 — Planner** (`agent/planner.js`) ✅
   - Recebe um goal em linguagem natural
   - Usa LLM (OpenAI) para decompor em steps (máx 10)
   - Cada step tem: tool, parâmetros, descrição, flag critical
@@ -320,6 +320,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 |------|-------|-----------------|
 | 2026-03-18 | — | Criação do roadmap e análise comparativa |
 | 2026-03-18 | 1.1 | Tool Registry dinâmico (`agent/tool-registry.js`) — 407 linhas, singleton EventEmitter, registro manual, loadFromMCP, loadFromSkills, hot-reload, getOpenAITools |
+| 2026-03-18 | 1.2 | Planner (`agent/planner.js`) — 324 linhas, createPlan via LLM, validação de tools, fuzzy match, fallback plan, needsPlanning heuristic |
 
 ---
 
