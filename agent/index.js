@@ -60,6 +60,13 @@ try {
   console.warn('[Agent] Reminder tools não disponíveis:', e.message);
 }
 
+let registerYouTubeTools = null;
+try {
+  registerYouTubeTools = require('../actions/register-youtube-tools').registerYouTubeTools;
+} catch (e) {
+  console.warn('[Agent] YouTube tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -155,6 +162,15 @@ async function initAgent(options = {}) {
       });
     } catch (e) {
       console.warn('[Agent] Erro ao registrar reminder tools:', e.message);
+    }
+  }
+
+  // Carrega YouTube tools
+  if (registerYouTubeTools) {
+    try {
+      registerYouTubeTools({ onExpression });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar YouTube tools:', e.message);
     }
   }
 
