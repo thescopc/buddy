@@ -159,6 +159,23 @@
 
     .new-pupil { transition: all 0.08s ease-out; }
 
+    /* Face Switcher */
+    #face-v1, #face-v2 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+    #face-v2 { display: none; }
+    #face-v2-iframe {
+      width: 320px;
+      height: 160px;
+      border: none;
+      background: transparent;
+      border-radius: 12px;
+    }
+
     .status-indicator {
       position: absolute;
       bottom: 4px;
@@ -582,6 +599,8 @@
 
     <div class="face-glow"></div>
 
+    <!-- V1: Rosto Clássico (SVG inline) -->
+    <div id="face-v1">
     <div class="face-container" id="buddy-face">
       <svg class="face-svg" width="130" height="170" viewBox="-2 -55 144 210" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -711,6 +730,12 @@
         <image id="buddy-hair" href="docs/cabelo.png" x="8" y="-7" width="123" height="84" preserveAspectRatio="xMidYMid meet"/>
       </svg>
     </div>
+    </div> <!-- /face-v1 -->
+
+    <!-- V2: Rosto Tech (iframe) -->
+    <div id="face-v2" style="display:none;">
+      <iframe id="face-v2-iframe" src="faces/v2/standby.html" frameborder="0" scrolling="no"></iframe>
+    </div>
 
     <span class="status-indicator" id="status">acordado ✨</span>
   </div>
@@ -838,6 +863,7 @@
   let ttsEnabled = true;
   let isProcessing = false;
   let currentExpression = 'happy';
+  let currentFaceStyle = 'v1';
   let blinkInterval;
   let idleTimeout;
 
@@ -1104,6 +1130,39 @@
     }, 3000 + Math.random() * 4000);
   }
   startBlinking();
+
+  // ============================================================
+  // FACE SWITCHER
+  // ============================================================
+  function switchFaceStyle(style) {
+    const faceV1 = document.getElementById('face-v1');
+    const faceV2 = document.getElementById('face-v2');
+    if (!faceV1 || !faceV2) return;
+
+    currentFaceStyle = style;
+
+    if (style === 'v2') {
+      faceV1.style.display = 'none';
+      faceV2.style.display = 'flex';
+      // Restaurar expressão atual no V2
+      setExpressionV2(currentExpression);
+    } else {
+      faceV2.style.display = 'none';
+      faceV1.style.display = 'flex';
+      // Restaurar expressão atual no V1
+      setExpressionV1(currentExpression);
+    }
+  }
+
+  // Carregar faceStyle do settings no startup
+  (async function loadFaceStyleOnStartup() {
+    try {
+      const s = await window.buddyAPI.getSettings();
+      if (s && s.faceStyle === 'v2') {
+        switchFaceStyle('v2');
+      }
+    } catch(e) { /* v1 default */ }
+  })();
 
   // Idle -> dormindo após 60s sem interação
   function resetIdleTimer() {
