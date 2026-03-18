@@ -8,6 +8,7 @@ memory/
 skills/
 google_calendar/
 main.js
+settings.json
 
 # Testes
 test_*.py

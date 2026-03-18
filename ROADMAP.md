@@ -276,7 +276,7 @@ Polish, testes e melhorias de UX.
   - Botão de cancelar task em andamento
   - **Critério de aceite:** Usuário vê progresso em tempo real de tasks multi-step
 
-- [ ] **6.3 — Settings panel**
+- [x] **6.3 — Settings panel** ✅
   - Tela de configurações acessível por ícone
   - Trocar modelo de IA (gpt-4o-mini, gpt-4o, gpt-4.1)
   - Configurar API keys (OpenAI, Google, Weather, etc)
@@ -351,6 +351,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 5.4 | Migração da memória (`memory/migrate-memory.js`) — ~150 linhas, parseia user.md + personality.md (formato "chave: valor"), converte para structured-memory.json, idempotente (pula se já migrado), execução automática no startup, preserva .md originais e daily/*.md, pode rodar standalone via `node memory/migrate-memory.js` |
 | 2026-03-18 | **5** | **✅ ETAPA 5 COMPLETA — Memória Inteligente 2.0 (4/4 sub-etapas)** |
 | 2026-03-18 | 6.2 | UI de progresso do Agent — barra de progresso animada (#agent-progress) com header/counter/step-name, `updateProgress()` por tool call, `formatToolLabel()` expandido para 44+ tools com ícones por categoria, `shortPath()` helper, botão cancelar integrado |
+| 2026-03-19 | 6.3 | Settings Panel — `settings-manager.js` singleton (load/save/migrate/getAllSafe com API keys mascaradas), `settings.json` persistente, IPCs get-settings/save-settings com atualização runtime, configs dinâmicas (OPENAI_API_KEY/MODEL/MAX_ITERATIONS/DANGEROUS_TOOLS carregam do settings), modal UI no index.html (modelo IA, API keys, toggles voz/proteção/memória), botão ⚙️, preload.js atualizado |
 
 ---
 

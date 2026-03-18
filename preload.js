@@ -24,4 +24,7 @@ contextBridge.exposeInMainWorld('buddyAPI', {
   onScheduledTask: (callback) => ipcRenderer.on('scheduled-task', (event, data) => callback(data)),
   onTriggerAgentMessage: (callback) => ipcRenderer.on('trigger-agent-message', (event, data) => callback(data)),
   schedulerTaskDone: () => ipcRenderer.send('scheduler-task-done'),
+  // Settings
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
 });

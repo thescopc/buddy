@@ -8,12 +8,21 @@ const { initAgent } = require('./agent');
 const { getMemoryManager } = require('./memory/memory-manager');
 const { MemoryExtractor } = require('./memory/memory-extractor');
 const { migrate: migrateMemory } = require('./memory/migrate-memory');
+const settingsManager = require('./settings-manager');
 
 // ============================================================
 // CONFIGURAÇÃO
 // ============================================================
-const OPENAI_API_KEY = 'SUA_OPENAI_API_KEY_AQUI'; // Obtenha em: https://platform.openai.com/api-keys
-const OPENAI_MODEL = 'gpt-4o-mini';
+const OPENAI_API_KEY_DEFAULT = 'SUA_OPENAI_API_KEY_AQUI'; // Fallback se settings.json não existir
+const OPENAI_MODEL_DEFAULT = 'gpt-4o-mini';
+
+// Carrega settings (migra do hardcoded se necessário)
+settingsManager.migrateFromMainJs(OPENAI_API_KEY_DEFAULT, OPENAI_MODEL_DEFAULT);
+const settings = settingsManager.load();
+
+// Usa settings ou fallback
+let OPENAI_API_KEY = settings.openaiApiKey || OPENAI_API_KEY_DEFAULT;
+let OPENAI_MODEL = settings.aiModel || OPENAI_MODEL_DEFAULT;
 // ============================================================
 
 // ============================================================
@@ -270,6 +279,29 @@ IMPORTANTE: NÃO marque como concluída antes de executar/responder. A prioridad
 ipcMain.on('scheduler-task-done', () => {
   isSchedulerRunning = false;
   console.log('[SCHEDULER] Tarefa concluída, scheduler liberado');
+});
+// ============================================================
+
+// ============================================================
+// IPC: Settings
+// ============================================================
+ipcMain.handle('get-settings', () => {
+  return settingsManager.getAllSafe();
+});
+
+ipcMain.handle('save-settings', (event, newSettings) => {
+  const result = settingsManager.save(newSettings);
+  if (result) {
+    // Atualiza variáveis em runtime
+    const s = settingsManager.load();
+    if (s.openaiApiKey) OPENAI_API_KEY = s.openaiApiKey;
+    if (s.aiModel) OPENAI_MODEL = s.aiModel;
+    // Atualiza extractor com nova API key
+    if (memoryExtractor && s.openaiApiKey) {
+      memoryExtractor.apiKey = s.openaiApiKey;
+    }
+  }
+  return result;
 });
 // ============================================================
 
@@ -552,8 +584,10 @@ ipcMain.on('minimize-app', () => { mainWindow.minimize(); });
 // ============================================================
 // AGENT CONFIG
 // ============================================================
-const MAX_AGENT_ITERATIONS = 25;
-const DANGEROUS_TOOLS = ['write_file', 'execute_command', 'move_file', 'edit_block'];
+const MAX_AGENT_ITERATIONS = settings.maxAgentIterations || 25;
+const DANGEROUS_TOOLS = settings.destructiveProtection !== false 
+  ? ['write_file', 'execute_command', 'move_file', 'edit_block'] 
+  : [];
 
 // Caminhos seguros que não precisam de confirmação (memória e tasks)
 function isSafePath(toolName, toolArgs) {
