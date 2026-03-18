@@ -67,6 +67,20 @@ try {
   console.warn('[Agent] YouTube tools não disponíveis:', e.message);
 }
 
+let registerMessageTools = null;
+try {
+  registerMessageTools = require('../actions/register-message-tools').registerMessageTools;
+} catch (e) {
+  console.warn('[Agent] Message tools não disponíveis:', e.message);
+}
+
+let registerCodeTools = null;
+try {
+  registerCodeTools = require('../actions/register-code-tools').registerCodeTools;
+} catch (e) {
+  console.warn('[Agent] Code tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -171,6 +185,27 @@ async function initAgent(options = {}) {
       registerYouTubeTools({ onExpression });
     } catch (e) {
       console.warn('[Agent] Erro ao registrar YouTube tools:', e.message);
+    }
+  }
+
+  // Carrega message tools (WhatsApp + Telegram)
+  if (registerMessageTools) {
+    try {
+      registerMessageTools({
+        onExpression,
+        browserControl: browserModules?.browserControl,
+      });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar message tools:', e.message);
+    }
+  }
+
+  // Carrega code helper tools
+  if (registerCodeTools) {
+    try {
+      registerCodeTools({ callLLM, onExpression });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar code tools:', e.message);
     }
   }
 
