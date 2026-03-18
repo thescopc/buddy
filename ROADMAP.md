@@ -105,7 +105,7 @@ Dá "olhos" ao Buddy — ele pode ver a tela, encontrar elementos e interagir.
   - Suporte a captura de webcam via getUserMedia
   - **Critério de aceite:** Captura tela e webcam em < 500ms, retorna JPEG < 100KB
 
-- [ ] **2.2 — Vision Analyzer** (`actions/vision-analyzer.js`)
+- [x] **2.2 — Vision Analyzer** (`actions/vision-analyzer.js`) ✅
   - Envia screenshot para OpenAI GPT-4o (vision)
   - Prompt otimizado para análise de tela
   - Retorna descrição textual do que vê
@@ -327,6 +327,7 @@ A Etapa 1 é pré-requisito para quase tudo — o Tool Registry e o Planner/Exec
 | 2026-03-18 | 1.6 | Integração no main.js — `agent/index.js` (135 linhas), callLLMForAgent, initBuddyAgent, IPCs (agent-run-task, agent-cancel-task, agent-status), preload atualizado, cleanup no shutdown |
 | 2026-03-18 | **1** | **✅ ETAPA 1 COMPLETA — Sistema de Agente Inteligente (Planner/Executor)** |
 | 2026-03-18 | 2.1 | Screen Capture (`actions/screen-capture.js`) — screenshot-desktop + sharp, captura 640x360 JPEG ~15KB em <400ms, multi-display, processamento webcam, auto-reduce quality |
+| 2026-03-18 | 2.2 | Vision Analyzer (`actions/vision-analyzer.js`) — 298 linhas, 3 modos (describe/findElement/readText), GPT-4o vision API, escalonamento de coordenadas, integração com ScreenCapture |
 
 ---
 
