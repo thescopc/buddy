@@ -626,9 +626,13 @@ ipcMain.on('agent-cancel', () => {
 ipcMain.handle('chat-with-claude', async (event, userMessage, history) => {
   agentCancelled = false;
 
-  // Monta lista de tools do MCP para o OpenAI
+  // Monta lista de tools (MCP + Tool Registry do Agent)
   let openaiTools = [];
-  if (mcpClient && mcpClient.ready) {
+  if (buddyAgent && buddyAgent.toolRegistry) {
+    // Usa o Tool Registry que tem MCP + todas as actions (44+ tools)
+    openaiTools = buddyAgent.toolRegistry.getOpenAITools();
+  } else if (mcpClient && mcpClient.ready) {
+    // Fallback: só MCP
     openaiTools = mcpClient.getTools().map(t => ({
       type: 'function',
       function: {
@@ -639,7 +643,7 @@ ipcMain.handle('chat-with-claude', async (event, userMessage, history) => {
     }));
   }
 
-  const toolNames = mcpClient?.ready ? mcpClient.getTools().map(t => t.name).join(', ') : 'nenhuma';
+  const toolNames = openaiTools.map(t => t.function.name).join(', ') || 'nenhuma';
   
   // Carrega memórias
   const memory = loadMemory();
@@ -829,7 +833,21 @@ COMO USAR SKILLS:
 
           let toolResult = '';
           try {
-            toolResult = await mcpClient.callTool(toolName, toolArgs);
+            // Tenta executar via Tool Registry primeiro (tem todas as 44+ tools)
+            if (buddyAgent && buddyAgent.toolRegistry) {
+              const registryTool = buddyAgent.toolRegistry.get(toolName);
+              if (registryTool && registryTool.execute) {
+                toolResult = await registryTool.execute(toolArgs);
+              } else if (mcpClient && mcpClient.ready) {
+                toolResult = await mcpClient.callTool(toolName, toolArgs);
+              } else {
+                toolResult = `Erro: Tool "${toolName}" não encontrada`;
+              }
+            } else if (mcpClient && mcpClient.ready) {
+              toolResult = await mcpClient.callTool(toolName, toolArgs);
+            } else {
+              toolResult = `Erro: Nenhum executor disponível para "${toolName}"`;
+            }
           } catch (e) {
             toolResult = `Erro: ${e.message}`;
           }
