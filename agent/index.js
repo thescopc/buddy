@@ -53,6 +53,13 @@ try {
   console.warn('[Agent] Weather tools não disponíveis:', e.message);
 }
 
+let registerReminderTools = null;
+try {
+  registerReminderTools = require('../actions/register-reminder-tools').registerReminderTools;
+} catch (e) {
+  console.warn('[Agent] Reminder tools não disponíveis:', e.message);
+}
+
 /**
  * Inicializa todo o sistema de agente.
  * 
@@ -135,6 +142,22 @@ async function initAgent(options = {}) {
     }
   }
 
+  // Carrega reminder tools
+  let reminderModules = null;
+  if (registerReminderTools) {
+    try {
+      reminderModules = registerReminderTools({
+        onExpression,
+        onReminder: (rem) => {
+          // Notifica via evento (TTS no main.js)
+          if (onEvent) onEvent('agent-reminder-fired', { message: rem.message, id: rem.id });
+        },
+      });
+    } catch (e) {
+      console.warn('[Agent] Erro ao registrar reminder tools:', e.message);
+    }
+  }
+
   // 2. Planner
   const planner = new Planner({ callLLM });
 
@@ -205,9 +228,11 @@ async function initAgent(options = {}) {
     async destroy() {
       taskQueue.destroy();
       toolRegistry.destroy();
-      // Fecha browser se estiver aberto
       if (browserModules && browserModules.browserControl) {
         await browserModules.browserControl.close().catch(() => {});
+      }
+      if (reminderModules && reminderModules.reminder) {
+        reminderModules.reminder.stop();
       }
       console.log('[Agent] Sistema destruído');
     }
