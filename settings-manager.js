@@ -33,6 +33,9 @@ const DEFAULT_SETTINGS = {
   
   // Agent
   maxAgentIterations: 25,
+
+  // Aparência
+  faceStyle: 'v1', // 'v1' (SVG clássico) ou 'v2' (CSS tech)
 };
 
 class SettingsManager {

@@ -814,6 +814,13 @@
           <label>Extração de memória</label>
           <input type="checkbox" id="set-memory-ext" checked>
         </div>
+        <div class="settings-group">
+          <label>Estilo do Rosto</label>
+          <select id="set-face-style">
+            <option value="v1">🎨 Rosto Clássico (V1)</option>
+            <option value="v2">🤖 Rosto Tech (V2)</option>
+          </select>
+        </div>
         <div class="settings-actions">
           <button onclick="saveSettings()">💾 Salvar</button>
           <span id="settings-status"></span>
@@ -1575,6 +1582,7 @@
       document.getElementById('set-voice').checked = s.voiceEnabled !== false;
       document.getElementById('set-protection').checked = s.destructiveProtection !== false;
       document.getElementById('set-memory-ext').checked = s.memoryExtraction !== false;
+      document.getElementById('set-face-style').value = s.faceStyle || 'v1';
       document.getElementById('settings-status').textContent = '';
     } catch(e) {
       document.getElementById('settings-status').textContent = 'Erro ao carregar';
@@ -1588,6 +1596,7 @@
       voiceEnabled: document.getElementById('set-voice').checked,
       destructiveProtection: document.getElementById('set-protection').checked,
       memoryExtraction: document.getElementById('set-memory-ext').checked,
+      faceStyle: document.getElementById('set-face-style').value,
     };
     // Só atualiza API keys se o campo não estiver mascarado (contém •)
     const keyFields = [
