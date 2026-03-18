@@ -165,15 +165,26 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-      height: 100%;
-    }
-    #face-v2 { display: none; }
-    #face-v2-iframe {
-      width: 320px;
       height: 160px;
+    }
+    #face-v2 { display: none; position: relative; overflow: hidden; background: #000; border-radius: 8px; }
+    #face-v2-iframe {
+      width: 500px;
+      height: 500px;
       border: none;
       background: transparent;
-      border-radius: 12px;
+      transform: scale(0.32);
+      transform-origin: top center;
+      pointer-events: none;
+    }
+    #face-v2-click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      z-index: 10;
     }
 
     .status-indicator {
@@ -735,6 +746,7 @@
     <!-- V2: Rosto Tech (iframe) -->
     <div id="face-v2" style="display:none;">
       <iframe id="face-v2-iframe" src="faces/v2/standby.html" frameborder="0" scrolling="no"></iframe>
+      <div id="face-v2-click-overlay"></div>
     </div>
 
     <span class="status-indicator" id="status">acordado ✨</span>
@@ -1326,6 +1338,21 @@
     }, 2000);
     resetIdleTimer();
   });
+
+  // Clique no overlay do V2 = mesmo comportamento
+  const v2Overlay = document.getElementById('face-v2-click-overlay');
+  if (v2Overlay) {
+    v2Overlay.addEventListener('click', () => {
+      stopSpeaking();
+      setExpression('angry');
+      setTimeout(() => {
+        if (currentExpression === 'angry') {
+          setExpression('happy');
+        }
+      }, 2000);
+      resetIdleTimer();
+    });
+  }
 
   // Carrega vozes (pode demorar)
   window.speechSynthesis.onvoiceschanged = () => {
